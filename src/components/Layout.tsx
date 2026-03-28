@@ -48,6 +48,7 @@ export function Layout({ children, searchQuery, onSearchChange, showSearch = fal
           )}
 
           <div className="flex-1" />
+          <GlobalSearch />
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1">
