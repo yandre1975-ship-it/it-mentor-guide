@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Book, Workflow, BrainCircuit, Briefcase, Layers } from 'lucide-react';
+import { Book, Workflow, BrainCircuit, Briefcase, Layers, Zap } from 'lucide-react';
 import {
   CommandDialog,
   CommandEmpty,
@@ -14,6 +14,7 @@ import { processes } from '@/data/processes';
 import { quizzes } from '@/data/quizzes';
 import { specialties } from '@/data/specialties';
 import { prototypes } from '@/data/prototypes';
+import { features } from '@/data/features';
 
 function Highlight({ text, query }: { text: string; query: string }) {
   if (!query.trim()) return <>{text}</>;
