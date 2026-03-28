@@ -20,9 +20,9 @@ export const categoryLabels: Record<Category, string> = {
 };
 
 export const difficultyLabels: Record<Difficulty, string> = {
-  beginner: 'Для новичков',
-  intermediate: 'Средний',
-  advanced: 'Продвинутый',
+  beginner: 'Junior',
+  intermediate: 'Middle',
+  advanced: 'Senior',
 };
 
 export const difficultyColors: Record<Difficulty, string> = {
