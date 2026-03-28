@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Book, Workflow, BrainCircuit, Briefcase, Layers } from 'lucide-react';
 import {
@@ -15,8 +15,26 @@ import { quizzes } from '@/data/quizzes';
 import { specialties } from '@/data/specialties';
 import { prototypes } from '@/data/prototypes';
 
+function Highlight({ text, query }: { text: string; query: string }) {
+  if (!query.trim()) return <>{text}</>;
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const parts = text.split(regex);
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part) ? (
+          <mark key={i} className="bg-primary/25 text-foreground rounded-sm px-0.5">{part}</mark>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
+}
+
 export function GlobalSearch() {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,6 +50,7 @@ export function GlobalSearch() {
 
   const go = (path: string) => {
     setOpen(false);
+    setQuery('');
     navigate(path);
   };
 
@@ -45,8 +64,8 @@ export function GlobalSearch() {
         <kbd className="pointer-events-none text-xs bg-muted px-1.5 py-0.5 rounded font-mono">⌘K</kbd>
       </button>
 
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Искать термины, процессы, квизы..." />
+      <CommandDialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setQuery(''); }}>
+        <CommandInput placeholder="Искать термины, процессы, квизы..." onValueChange={setQuery} />
         <CommandList>
           <CommandEmpty>Ничего не найдено</CommandEmpty>
 
@@ -54,7 +73,7 @@ export function GlobalSearch() {
             {terms.map((t) => (
               <CommandItem key={t.id} onSelect={() => go(`/term/${t.id}`)}>
                 <Book className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
-                <span>{t.title}</span>
+                <span><Highlight text={t.title} query={query} /></span>
               </CommandItem>
             ))}
           </CommandGroup>
@@ -63,7 +82,7 @@ export function GlobalSearch() {
             {specialties.map((s) => (
               <CommandItem key={s.id} onSelect={() => go('/specialties')} keywords={[s.title, s.description]}>
                 <Briefcase className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
-                <span>{s.title}</span>
+                <span><Highlight text={s.title} query={query} /></span>
               </CommandItem>
             ))}
           </CommandGroup>
@@ -72,7 +91,7 @@ export function GlobalSearch() {
             {prototypes.map((p) => (
               <CommandItem key={p.id} onSelect={() => go('/prototypes')} keywords={[p.title, p.description]}>
                 <Layers className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
-                <span>{p.title}</span>
+                <span><Highlight text={p.title} query={query} /></span>
               </CommandItem>
             ))}
           </CommandGroup>
@@ -81,7 +100,7 @@ export function GlobalSearch() {
             {processes.map((p) => (
               <CommandItem key={p.id} onSelect={() => go('/processes')} keywords={[p.title, p.description]}>
                 <Workflow className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
-                <span>{p.title}</span>
+                <span><Highlight text={p.title} query={query} /></span>
               </CommandItem>
             ))}
           </CommandGroup>
@@ -90,7 +109,7 @@ export function GlobalSearch() {
             {quizzes.map((q) => (
               <CommandItem key={q.id} onSelect={() => go('/quizzes')} keywords={[q.title]}>
                 <BrainCircuit className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
-                <span>{q.title}</span>
+                <span><Highlight text={q.title} query={query} /></span>
               </CommandItem>
             ))}
           </CommandGroup>
