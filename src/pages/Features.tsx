@@ -72,8 +72,10 @@ const Features = () => {
             return (
               <Card
                 key={feature.id}
-                className={`transition-all cursor-pointer ${isExpanded ? 'sm:col-span-2 lg:col-span-3 border-primary/40' : 'hover:shadow-md hover:border-primary/30'}`}
+                className={`transition-all cursor-pointer ${isExpanded ? 'border-primary/40 shadow-md' : 'hover:shadow-md hover:border-primary/30'}`}
                 onClick={() => setExpandedId(isExpanded ? null : feature.id)}
+                role="button"
+                aria-expanded={isExpanded}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-2">

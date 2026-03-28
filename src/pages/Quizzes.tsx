@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { BrainCircuit, CheckCircle2, XCircle, RotateCcw } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function Quizzes() {
   const [activeQuizId, setActiveQuizId] = useState<string | null>(null);
@@ -50,6 +51,24 @@ export default function Quizzes() {
     setActiveQuizId(null);
     resetQuiz();
   };
+
+  // Keyboard shortcuts for quiz
+  useEffect(() => {
+    if (!activeQuiz || finished) return;
+    const question = activeQuiz.questions[currentQ];
+    const handler = (e: KeyboardEvent) => {
+      if (!answered) {
+        const num = parseInt(e.key);
+        if (num >= 1 && num <= question.options.length) {
+          handleAnswer(num - 1);
+        }
+      } else if (e.key === 'Enter') {
+        handleNext();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [activeQuiz, currentQ, answered, finished]);
 
   // Quiz list
   if (!activeQuiz) {
@@ -158,7 +177,8 @@ export default function Quizzes() {
                   disabled={answered && i !== selected && i !== question.correctIndex}
                 >
                   {icon}
-                  <span className="ml-1">{option}</span>
+                  <span className="ml-1 flex-1">{option}</span>
+                  {!answered && <kbd className="ml-auto text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded font-mono">{i + 1}</kbd>}
                 </Button>
               );
             })}
