@@ -28,7 +28,7 @@ const navItems = [
 const mobileMainNav = navItems.slice(0, 4);
 const mobileMoreNav = navItems.slice(4);
 
-export function Layout({ children, searchQuery, onSearchChange, showSearch = false }: LayoutProps) {
+export function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -41,18 +41,6 @@ export function Layout({ children, searchQuery, onSearchChange, showSearch = fal
             <Book className="h-6 w-6 text-primary" />
             <span className="hidden sm:inline">IT-Библиотека</span>
           </Link>
-
-          {showSearch && (
-            <div className="flex-1 max-w-md relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Поиск..."
-                value={searchQuery || ''}
-                onChange={(e) => onSearchChange?.(e.target.value)}
-                className="pl-9 h-9"
-              />
-            </div>
-          )}
 
           <div className="flex-1" />
           <GlobalSearch />
