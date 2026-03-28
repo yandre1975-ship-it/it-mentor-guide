@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageCircle, X, Send, Bot, User, Loader2, Mic, MicOff } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Loader2, Mic, MicOff, Trash2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
@@ -165,14 +165,29 @@ function ChatInput({
   );
 }
 
+const CHAT_STORAGE_KEY = 'ai-chat-history';
+
+function loadMessages(): Msg[] {
+  try {
+    const raw = localStorage.getItem(CHAT_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function saveMessages(msgs: Msg[]) {
+  try { localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(msgs)); } catch {}
+}
+
 export function AiChat() {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Msg[]>([]);
+  const [messages, setMessages] = useState<Msg[]>(loadMessages);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => { saveMessages(messages); }, [messages]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -248,6 +263,16 @@ export function AiChat() {
               <p className="text-sm font-semibold">AI-ассистент</p>
               <p className="text-xs text-muted-foreground">Спросите о терминах, технологиях, процессах</p>
             </div>
+            {messages.length > 0 && (
+              <button
+                onClick={() => setMessages([])}
+                className="p-1 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                aria-label="Очистить историю"
+                title="Очистить историю"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
             <button onClick={() => setOpen(false)} className="p-1 rounded-md hover:bg-secondary transition-colors">
               <X className="h-4 w-4" />
             </button>
