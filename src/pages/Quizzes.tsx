@@ -52,6 +52,24 @@ export default function Quizzes() {
     resetQuiz();
   };
 
+  // Keyboard shortcuts for quiz
+  useEffect(() => {
+    if (!activeQuiz || finished) return;
+    const question = activeQuiz.questions[currentQ];
+    const handler = (e: KeyboardEvent) => {
+      if (!answered) {
+        const num = parseInt(e.key);
+        if (num >= 1 && num <= question.options.length) {
+          handleAnswer(num - 1);
+        }
+      } else if (e.key === 'Enter') {
+        handleNext();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [activeQuiz, currentQ, answered, finished]);
+
   // Quiz list
   if (!activeQuiz) {
     const filteredQuizzes = quizzes.filter((q) => {
