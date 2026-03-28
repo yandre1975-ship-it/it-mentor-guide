@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { terms } from '@/data/terms';
@@ -11,8 +12,14 @@ import { Star, Printer, Trash2 } from 'lucide-react';
 export default function Favorites() {
   const [favorites, setFavorites] = useLocalStorage<string[]>('it-library-favorites', []);
   const [notes] = useLocalStorage<Record<string, string>>('it-library-notes', {});
+  const [search, setSearch] = useState('');
 
-  const favoriteTerms = terms.filter((t) => favorites.includes(t.id));
+  const favoriteTerms = terms.filter((t) => {
+    if (!favorites.includes(t.id)) return false;
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return t.title.toLowerCase().includes(q) || t.definition.toLowerCase().includes(q);
+  });
 
   const handlePrint = () => window.print();
   const removeFavorite = (id: string) => setFavorites(favorites.filter((f) => f !== id));
@@ -33,7 +40,7 @@ export default function Favorites() {
   }
 
   return (
-    <Layout>
+    <Layout searchQuery={search} onSearchChange={setSearch} showSearch>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

@@ -111,12 +111,19 @@ function PrototypeVisual({ zones, activeZone, onSelect }: {
 export default function Prototypes() {
   const [selectedPrototype, setSelectedPrototype] = useState(prototypes[0].id);
   const [activeZone, setActiveZone] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
 
-  const current = prototypes.find((p) => p.id === selectedPrototype)!;
+  const filtered = prototypes.filter((p) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.zones.some(z => z.label.toLowerCase().includes(q));
+  });
+
+  const current = (filtered.find((p) => p.id === selectedPrototype) || filtered[0] || prototypes[0]);
   const currentZone = current.zones.find((z) => z.id === activeZone);
 
   return (
-    <Layout>
+    <Layout searchQuery={search} onSearchChange={setSearch} showSearch>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Схемы проектов</h1>
@@ -127,7 +134,7 @@ export default function Prototypes() {
 
         {/* Project selector */}
         <div className="flex flex-wrap gap-2">
-          {prototypes.map((p) => (
+          {filtered.map((p) => (
             <button
               key={p.id}
               onClick={() => { setSelectedPrototype(p.id); setActiveZone(null); }}

@@ -9,17 +9,26 @@ import { Briefcase, Wrench, TrendingUp, Code, ChevronDown, ChevronUp } from 'luc
 
 export default function Specialties() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+
+  const filtered = specialties.filter((s) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return s.title.toLowerCase().includes(q) || s.description.toLowerCase().includes(q) || s.skills.some(sk => sk.toLowerCase().includes(q));
+  });
 
   return (
-    <Layout>
+    <Layout searchQuery={search} onSearchChange={setSearch} showSearch>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">IT-специальности</h1>
           <p className="text-muted-foreground mt-1">Обзор востребованных профессий в сфере информационных технологий</p>
         </div>
 
+        <p className="text-sm text-muted-foreground">Найдено: {filtered.length}</p>
+
         <div className="grid gap-4 sm:grid-cols-2">
-          {specialties.map((spec) => {
+          {filtered.map((spec) => {
             const isExpanded = expandedId === spec.id;
             const related = terms.filter((t) => spec.relatedTermIds.includes(t.id));
 
