@@ -97,7 +97,15 @@ export function GlobalSearch() {
             ))}
           </CommandGroup>
 
-          <CommandGroup heading="Процессы">
+          <CommandGroup heading="Фичи">
+            {features.map((f) => (
+              <CommandItem key={f.id} onSelect={() => go('/features')} keywords={[f.title, f.description]}>
+                <Zap className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                <span><Highlight text={f.title} query={query} /></span>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+
             {processes.map((p) => (
               <CommandItem key={p.id} onSelect={() => go('/processes')} keywords={[p.title, p.description]}>
                 <Workflow className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
