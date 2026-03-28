@@ -308,4 +308,79 @@ export const features: Feature[] = [
     D -->|агрегация| E[Дашборды]
     E -->|воронки, ретеншн| F[Бизнес-решения]`,
   },
+  {
+    id: 'ab-testing',
+    title: 'A/B-тестирование',
+    description: 'Сравнение двух и более вариантов интерфейса или функции на реальных пользователях для выбора лучшего по метрикам.',
+    category: 'data',
+    complexity: 'complex',
+    relatedTermIds: ['api', 'database'],
+    specialistIds: ['frontend-developer', 'data-analyst'],
+    tools: ['Google Optimize', 'LaunchDarkly', 'PostHog', 'Statsig', 'Feature Flags'],
+    howItWorks: 'Пользователь попадает в случайную группу (A или B) → видит свой вариант → действия отслеживаются → после набора статистически значимой выборки сравниваются конверсии → побеждает лучший вариант.',
+    diagramCode: `graph LR
+    A[Пользователь] -->|запрос| B{Feature Flag}
+    B -->|группа A 50%| C[Вариант A]
+    B -->|группа B 50%| D[Вариант B]
+    C -->|события| E[Аналитика]
+    D -->|события| E
+    E -->|статистика| F{Значимая разница?}
+    F -->|да| G[Выкатить победителя]
+    F -->|нет| H[Продолжить тест]`,
+  },
+  {
+    id: 'geolocation',
+    title: 'Геолокация',
+    description: 'Определение местоположения пользователя через GPS, Wi-Fi или IP-адрес для персонализации контента, карт и поиска.',
+    category: 'data',
+    complexity: 'medium',
+    relatedTermIds: ['api', 'dom'],
+    specialistIds: ['frontend-developer', 'backend-developer', 'mobile-developer'],
+    tools: ['Geolocation API', 'Google Maps', 'Mapbox', 'ipinfo.io', 'Leaflet'],
+    howItWorks: 'Браузер запрашивает разрешение → Geolocation API возвращает координаты (GPS/Wi-Fi) → координаты отправляются на сервер → сервер определяет город/страну через геокодер → контент персонализируется.',
+    diagramCode: `graph LR
+    A[Приложение] -->|запрос разрешения| B[Пользователь]
+    B -->|разрешил| C[Geolocation API]
+    C -->|lat, lng| D[Сервер]
+    D -->|координаты| E[Геокодер]
+    E -->|город, страна| F[Персонализация]
+    F -->|локальный контент| A`,
+  },
+  {
+    id: '2fa',
+    title: 'Двухфакторная аутентификация (2FA)',
+    description: 'Дополнительный уровень безопасности: помимо пароля требуется одноразовый код из приложения, SMS или аппаратного ключа.',
+    category: 'auth',
+    complexity: 'complex',
+    relatedTermIds: ['api', 'rest-api', 'database'],
+    specialistIds: ['backend-developer', 'frontend-developer'],
+    tools: ['TOTP', 'Google Authenticator', 'Authy', 'WebAuthn', 'Twilio'],
+    howItWorks: 'Пользователь включает 2FA → сервер генерирует секретный ключ → пользователь сканирует QR-код в приложении → при входе после пароля вводит 6-значный TOTP-код → сервер проверяет код по общему секрету.',
+    diagramCode: `graph LR
+    A[Вход: email + пароль] -->|верно| B{2FA включена?}
+    B -->|нет| C[Доступ открыт]
+    B -->|да| D[Запрос TOTP кода]
+    D -->|ввод кода| E[Сервер]
+    E -->|проверка TOTP| F{Код верный?}
+    F -->|да| C
+    F -->|нет| G[Отказ в доступе]`,
+  },
+  {
+    id: 'pdf-export',
+    title: 'Экспорт в PDF',
+    description: 'Генерация PDF-документов из данных приложения: отчёты, счета, резюме, сертификаты.',
+    category: 'data',
+    complexity: 'medium',
+    relatedTermIds: ['api', 'dom'],
+    specialistIds: ['backend-developer', 'frontend-developer'],
+    tools: ['Puppeteer', 'jsPDF', 'html2canvas', 'ReportLab', 'Print CSS'],
+    howItWorks: 'Данные подставляются в HTML-шаблон → шаблон рендерится в headless-браузере (Puppeteer) или через Canvas → генерируется PDF-файл → файл отдаётся пользователю для скачивания.',
+    diagramCode: `graph LR
+    A[Данные из БД] -->|подстановка| B[HTML шаблон]
+    B -->|рендер| C{Метод}
+    C -->|серверный| D[Puppeteer / headless]
+    C -->|клиентский| E[jsPDF + html2canvas]
+    D -->|PDF buffer| F[Файл для скачивания]
+    E -->|PDF blob| F`,
+  },
 ];
