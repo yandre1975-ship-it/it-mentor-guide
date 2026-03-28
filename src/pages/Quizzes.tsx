@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { BrainCircuit, CheckCircle2, XCircle, RotateCcw } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function Quizzes() {
   const [activeQuizId, setActiveQuizId] = useState<string | null>(null);
