@@ -1,3 +1,13 @@
+export type ZoneLayer = 'frontend' | 'backend' | 'data' | 'infra' | 'product';
+
+export const layerConfig: Record<ZoneLayer, { label: string; color: string; icon: string }> = {
+  frontend: { label: 'Frontend', color: 'hsl(var(--primary))', icon: '🖥️' },
+  backend: { label: 'Backend', color: 'hsl(var(--warning))', icon: '⚙️' },
+  data: { label: 'Data', color: 'hsl(var(--success))', icon: '🗄️' },
+  infra: { label: 'Infra', color: 'hsl(var(--destructive))', icon: '🏗️' },
+  product: { label: 'Product', color: 'hsl(var(--info))', icon: '📋' },
+};
+
 export interface PrototypeZone {
   id: string;
   label: string;
@@ -10,6 +20,7 @@ export interface PrototypeZone {
   terms: string[];
   specialists: string[];
   tools: string[];
+  layer?: ZoneLayer;
   // Enriched fields
   purpose?: string;
   elements?: string[];
