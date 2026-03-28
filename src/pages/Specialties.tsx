@@ -37,6 +37,8 @@ export default function Specialties() {
                 <CardHeader
                   className="cursor-pointer hover:bg-secondary/50 transition-colors"
                   onClick={() => setExpandedId(isExpanded ? null : spec.id)}
+                  role="button"
+                  aria-expanded={isExpanded}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-start gap-3">
