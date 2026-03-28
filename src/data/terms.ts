@@ -1015,4 +1015,214 @@ print("Predictions:", predictions)`,
     difficulty: 'beginner',
     relatedTerms: ['ml', 'neural-network', 'dataset'],
   },
+
+  // === IT-СПЕЦИАЛЬНОСТИ (10) ===
+  {
+    id: 'spec-frontend',
+    title: 'Frontend-разработчик',
+    definition: 'Специалист, создающий визуальную часть веб-приложений. Отвечает за вёрстку, интерактивность и пользовательский опыт в браузере.',
+    analogy: 'Дизайнер интерьеров: он делает дом (сайт) красивым и удобным для жильцов (пользователей), расставляя мебель (элементы интерфейса) так, чтобы было комфортно.',
+    exampleCode: `// React component
+function Button({ label, onClick }) {
+  return (
+    <button
+      className="px-4 py-2 bg-blue-500 text-white rounded"
+      onClick={onClick}
+    >
+      {label}
+    </button>
+  );
+}`,
+    exampleLanguage: 'javascript',
+    category: 'specialties',
+    difficulty: 'beginner',
+    relatedTerms: ['framework', 'http', 'api'],
+  },
+  {
+    id: 'spec-backend',
+    title: 'Backend-разработчик',
+    definition: 'Специалист, отвечающий за серверную логику, базы данных, API и интеграции. Обеспечивает работу «под капотом» приложения.',
+    analogy: 'Повар на кухне ресторана: клиент не видит его работу, но именно от повара зависит качество блюда (данных), которое приносит официант (API).',
+    exampleCode: `# Flask API endpoint
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+@app.route("/api/users")
+def get_users():
+    users = db.query("SELECT * FROM users")
+    return jsonify(users)
+
+app.run(port=5000)`,
+    exampleLanguage: 'python',
+    category: 'specialties',
+    difficulty: 'beginner',
+    relatedTerms: ['api', 'sql', 'web-server'],
+  },
+  {
+    id: 'spec-devops',
+    title: 'DevOps-инженер',
+    definition: 'Специалист на стыке разработки и эксплуатации. Автоматизирует CI/CD-пайплайны, управляет инфраструктурой и обеспечивает стабильность сервисов.',
+    analogy: 'Логист на заводе: он не делает детали сам, но обеспечивает бесперебойную доставку (деплой) продукции (кода) от цеха (разработки) до магазина (продакшна).',
+    exampleCode: `# GitHub Actions CI/CD
+name: Deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm install && npm run build
+      - run: docker build -t myapp .
+      - run: docker push registry.io/myapp`,
+    exampleLanguage: 'yaml',
+    category: 'specialties',
+    difficulty: 'intermediate',
+    relatedTerms: ['deploy', 'commit', 'hosting'],
+  },
+  {
+    id: 'spec-data-scientist',
+    title: 'Data Scientist',
+    definition: 'Специалист по анализу данных и машинному обучению. Строит модели для прогнозирования, классификации и поиска закономерностей в данных.',
+    analogy: 'Детектив: изучает улики (данные), находит паттерны (закономерности) и делает выводы (предсказания), которые помогают раскрыть дело (решить бизнес-задачу).',
+    exampleCode: `import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+
+df = pd.read_csv("customers.csv")
+X = df[["age", "income", "visits"]]
+y = df["will_buy"]
+
+model = RandomForestClassifier()
+model.fit(X, y)
+print("Accuracy:", model.score(X, y))`,
+    exampleLanguage: 'python',
+    category: 'specialties',
+    difficulty: 'intermediate',
+    relatedTerms: ['ml', 'dataset', 'neural-network'],
+  },
+  {
+    id: 'spec-qa',
+    title: 'QA-инженер',
+    definition: 'Специалист по обеспечению качества ПО. Проектирует тесты, находит баги и автоматизирует проверку работоспособности продукта.',
+    analogy: 'ОТК на заводе: прежде чем товар (продукт) попадёт к покупателю (пользователю), контролёр (QA) проверяет каждую деталь на дефекты (баги).',
+    exampleCode: `// Playwright E2E test
+import { test, expect } from "@playwright/test";
+
+test("login flow", async ({ page }) => {
+  await page.goto("/login");
+  await page.fill("#email", "user@test.com");
+  await page.fill("#password", "secret");
+  await page.click("button[type=submit]");
+  await expect(page).toHaveURL("/dashboard");
+});`,
+    exampleLanguage: 'typescript',
+    category: 'specialties',
+    difficulty: 'beginner',
+    relatedTerms: ['bug', 'testing', 'unit-test'],
+  },
+  {
+    id: 'spec-mobile',
+    title: 'Мобильный разработчик',
+    definition: 'Создаёт приложения для смартфонов и планшетов на iOS и/или Android. Может работать с нативными языками или кроссплатформенными фреймворками.',
+    analogy: 'Архитектор мини-домов: он проектирует компактные (мобильные), но функциональные пространства с учётом всех ограничений размера экрана.',
+    exampleCode: `// React Native component
+import { View, Text, TouchableOpacity } from "react-native";
+
+export default function App() {
+  return (
+    <View style={{ flex: 1, justifyContent: "center" }}>
+      <Text style={{ fontSize: 24 }}>Hello, Mobile!</Text>
+      <TouchableOpacity onPress={() => alert("Tapped!")}>
+        <Text>Tap me</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}`,
+    exampleLanguage: 'javascript',
+    category: 'specialties',
+    difficulty: 'beginner',
+    relatedTerms: ['framework', 'api', 'object'],
+  },
+  {
+    id: 'spec-security',
+    title: 'Специалист по кибербезопасности',
+    definition: 'Защищает информационные системы от взломов, утечек и кибератак. Проводит аудит, пентесты и разрабатывает политики безопасности.',
+    analogy: 'Охранная служба здания: проверяет замки (уязвимости), устанавливает камеры (мониторинг) и тренирует персонал (обучает команду безопасности).',
+    exampleCode: `# SQL Injection check
+# Vulnerable:
+query = f"SELECT * FROM users WHERE name = '{input}'"
+
+# Safe (parameterized):
+cursor.execute(
+    "SELECT * FROM users WHERE name = %s",
+    (input,)
+)`,
+    exampleLanguage: 'python',
+    category: 'specialties',
+    difficulty: 'intermediate',
+    relatedTerms: ['http', 'dns', 'web-server'],
+  },
+  {
+    id: 'spec-ml-engineer',
+    title: 'ML-инженер',
+    definition: 'Специалист по внедрению моделей машинного обучения в продакшн. Строит ML-пайплайны, оптимизирует модели и следит за их качеством в работе.',
+    analogy: 'Инженер, который превращает лабораторный прототип (модель) в серийный продукт (сервис): настраивает конвейер, контролирует качество и масштабирует производство.',
+    exampleCode: `# MLflow model tracking
+import mlflow
+
+with mlflow.start_run():
+    model.fit(X_train, y_train)
+    accuracy = model.score(X_test, y_test)
+
+    mlflow.log_param("n_estimators", 100)
+    mlflow.log_metric("accuracy", accuracy)
+    mlflow.sklearn.log_model(model, "model")`,
+    exampleLanguage: 'python',
+    category: 'specialties',
+    difficulty: 'advanced',
+    relatedTerms: ['neural-network', 'deep-learning', 'ml'],
+  },
+  {
+    id: 'spec-fullstack',
+    title: 'Fullstack-разработчик',
+    definition: 'Универсальный разработчик, владеющий и фронтендом, и бэкендом. Может создать приложение «от и до» — от интерфейса до серверной логики и базы данных.',
+    analogy: 'Мастер-универсал в автосервисе: умеет и кузов покрасить (фронтенд), и двигатель починить (бэкенд), что особенно ценно в небольших командах.',
+    exampleCode: `// Next.js API route + page
+// pages/api/hello.ts
+export default function handler(req, res) {
+  res.json({ message: "Hello from API" });
+}
+
+// pages/index.tsx
+export default function Home({ data }) {
+  return <h1>{data.message}</h1>;
+}`,
+    exampleLanguage: 'typescript',
+    category: 'specialties',
+    difficulty: 'intermediate',
+    relatedTerms: ['framework', 'api', 'deploy', 'stack'],
+  },
+  {
+    id: 'spec-analyst',
+    title: 'Системный аналитик',
+    definition: 'Связующее звено между бизнесом и разработкой. Собирает требования, проектирует решения, пишет технические задания и следит за соответствием продукта потребностям.',
+    analogy: 'Переводчик между заказчиком и строителями: клиент говорит «хочу уютный дом», а аналитик превращает это в чертежи (ТЗ) с точными размерами.',
+    exampleCode: `# User Story format
+## US-042: Регистрация пользователя
+
+**Как** новый пользователь
+**Я хочу** зарегистрироваться по email
+**Чтобы** получить доступ к личному кабинету
+
+### Критерии приёмки:
+- [ ] Валидация email
+- [ ] Пароль >= 8 символов
+- [ ] Письмо с подтверждением`,
+    exampleLanguage: 'markdown',
+    category: 'specialties',
+    difficulty: 'beginner',
+    relatedTerms: ['api', 'sql', 'microservice'],
+  },
 ];
