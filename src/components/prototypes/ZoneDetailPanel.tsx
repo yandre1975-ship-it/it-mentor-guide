@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useChecklistProgress } from '@/hooks/useChecklistProgress';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { terms } from '@/data/terms';
@@ -276,7 +277,11 @@ function DeepDiveLevel({ zone, allZones, relatedTerms, dependsOn, dependedBy }: 
   dependsOn: PrototypeZone[];
   dependedBy: PrototypeZone[];
 }) {
+  const { isChecked, toggle, checkedCount, resetZone } = useChecklistProgress(zone.id);
   const [showChecklist, setShowChecklist] = useState(true);
+  const total = zone.checklist?.length ?? 0;
+  const done = checkedCount(total);
+  const progress = total > 0 ? Math.round((done / total) * 100) : 0;
 
   return (
     <>
@@ -287,20 +292,50 @@ function DeepDiveLevel({ zone, allZones, relatedTerms, dependsOn, dependedBy }: 
             onClick={() => setShowChecklist(p => !p)}
             className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium hover:bg-muted/50 transition-colors"
           >
-            <CheckCircle2 className="h-4 w-4 shrink-0 text-[hsl(var(--info))]" />
+            <CheckCircle2 className={`h-4 w-4 shrink-0 ${progress === 100 ? 'text-[hsl(var(--success))]' : 'text-[hsl(var(--info))]'}`} />
             <span className="flex-1 text-left">Чеклист готовности</span>
-            <Badge variant="secondary" className="text-[10px] h-5">{zone.checklist.length}</Badge>
+            <span className="text-[10px] text-muted-foreground font-normal">{done}/{total}</span>
             {showChecklist ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
           </button>
+          {/* Progress bar */}
+          <div className="mx-3 h-1.5 rounded-full bg-muted overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${progress === 100 ? 'bg-[hsl(var(--success))]' : 'bg-[hsl(var(--info))]'}`}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
           {showChecklist && (
-            <ul className="px-3 pb-2 space-y-1">
-              {zone.checklist.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                  <span className="mt-1.5 h-1 w-1 rounded-full shrink-0 bg-[hsl(var(--info))]" />
-                  {item}
-                </li>
-              ))}
+            <ul className="px-3 py-2 space-y-1">
+              {zone.checklist.map((item, i) => {
+                const checked = isChecked(i);
+                return (
+                  <li key={i}>
+                    <button
+                      onClick={() => toggle(i)}
+                      className={`w-full flex items-start gap-2 text-xs text-left px-1.5 py-1 rounded-md transition-colors hover:bg-muted/50 ${
+                        checked ? 'text-muted-foreground line-through' : 'text-foreground'
+                      }`}
+                    >
+                      <span className={`mt-0.5 h-3.5 w-3.5 rounded border shrink-0 flex items-center justify-center transition-colors ${
+                        checked
+                          ? 'bg-[hsl(var(--success))] border-[hsl(var(--success))] text-[hsl(var(--success-foreground))]'
+                          : 'border-border'
+                      }`}>
+                        {checked && <span className="text-[8px]">✓</span>}
+                      </span>
+                      {item}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
+          )}
+          {done > 0 && showChecklist && (
+            <div className="px-3 pb-2">
+              <button onClick={resetZone} className="text-[10px] text-muted-foreground hover:text-destructive transition-colors">
+                Сбросить прогресс
+              </button>
+            </div>
           )}
         </div>
       )}

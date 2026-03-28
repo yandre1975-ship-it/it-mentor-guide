@@ -60,8 +60,59 @@ function PrototypeVisual({ zones, activeZone, onSelect, viewMode, highlightSpeci
     return zone.specialists.includes(highlightSpecialist);
   };
 
+  // Build dependency edges
+  const dependencyEdges = useMemo(() => {
+    if (viewMode !== 'dependencies') return [];
+    const edges: { from: PrototypeZone; to: PrototypeZone; highlighted: boolean }[] = [];
+    zones.forEach(zone => {
+      zone.dependencies?.forEach(depId => {
+        const dep = zones.find(z => z.id === depId);
+        if (dep) {
+          const highlighted = activeZone ? (zone.id === activeZone || depId === activeZone) : false;
+          edges.push({ from: dep, to: zone, highlighted });
+        }
+      });
+    });
+    return edges;
+  }, [zones, viewMode, activeZone]);
+
   return (
     <div className="relative w-full rounded-xl border-2 border-border bg-muted/20 overflow-hidden" style={{ paddingBottom: '55%' }}>
+      {/* SVG dependency lines */}
+      {dependencyEdges.length > 0 && (
+        <svg className="absolute inset-0 w-full h-full z-[5] pointer-events-none" preserveAspectRatio="none">
+          <defs>
+            <marker id="dep-arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 3.5 L 0 7 z" className="fill-primary" />
+            </marker>
+            <marker id="dep-arrow-dim" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 3.5 L 0 7 z" className="fill-muted-foreground/30" />
+            </marker>
+          </defs>
+          {dependencyEdges.map(({ from, to, highlighted }) => {
+            const x1 = from.x + from.width / 2;
+            const y1 = from.y + from.height / 2;
+            const x2 = to.x + to.width / 2;
+            const y2 = to.y + to.height / 2;
+            const isHighlighted = !activeZone || highlighted;
+            return (
+              <line
+                key={`${from.id}-${to.id}`}
+                x1={`${x1}%`} y1={`${y1}%`}
+                x2={`${x2}%`} y2={`${y2}%`}
+                className={`transition-all duration-300 ${
+                  isHighlighted
+                    ? 'stroke-primary stroke-[2px]'
+                    : 'stroke-muted-foreground/20 stroke-[1px]'
+                }`}
+                markerEnd={isHighlighted ? 'url(#dep-arrow)' : 'url(#dep-arrow-dim)'}
+                strokeDasharray={isHighlighted ? 'none' : '4 3'}
+              />
+            );
+          })}
+        </svg>
+      )}
+
       {zones.map((zone) => {
         const isActive = activeZone === zone.id;
         const isDep = getDependencyHighlight(zone);
