@@ -5,7 +5,8 @@ export type Category =
   | 'web'
   | 'development'
   | 'databases'
-  | 'architecture';
+  | 'architecture'
+  | 'ai';
 
 export const categoryLabels: Record<Category, string> = {
   basics: 'Основы',
@@ -13,6 +14,7 @@ export const categoryLabels: Record<Category, string> = {
   development: 'Разработка',
   databases: 'Базы данных',
   architecture: 'Архитектура',
+  ai: 'Искусственный интеллект',
 };
 
 export const difficultyLabels: Record<Difficulty, string> = {

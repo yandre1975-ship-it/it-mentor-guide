@@ -678,4 +678,341 @@ console.log(multiply(4, 5)); // 20`,
     difficulty: 'beginner',
     relatedTerms: ['function', 'framework', 'pattern'],
   },
+
+  // === ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ (15) ===
+  {
+    id: 'neural-network',
+    title: 'Нейросеть',
+    definition: 'Математическая модель, вдохновлённая строением мозга. Состоит из слоёв искусственных нейронов, которые обрабатывают данные и обучаются на примерах.',
+    analogy: 'Команда экспертов: каждый нейрон — специалист, который анализирует свою часть данных и передаёт вывод коллегам. Вместе они принимают коллективное решение.',
+    exampleCode: `import tensorflow as tf
+
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam', loss='categorical_crossentropy')
+model.summary()`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'intermediate',
+    relatedTerms: ['ml', 'deep-learning', 'dataset'],
+  },
+  {
+    id: 'ml',
+    title: 'Машинное обучение (ML)',
+    definition: 'Подраздел ИИ, в котором алгоритмы учатся на данных и улучшают свои результаты без явного программирования каждого правила.',
+    analogy: 'Ребёнок учится различать кошек и собак: никто не пишет ему инструкцию — он смотрит на примеры и со временем начинает узнавать животных сам.',
+    exampleCode: `from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    features, labels, test_size=0.2
+)
+
+model = RandomForestClassifier(n_estimators=100)
+model.fit(X_train, y_train)
+accuracy = model.score(X_test, y_test)
+print(f"Accuracy: {accuracy:.2f}")`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'beginner',
+    relatedTerms: ['neural-network', 'dataset', 'supervised-learning'],
+  },
+  {
+    id: 'dataset',
+    title: 'Датасет',
+    definition: 'Структурированный набор данных, используемый для обучения и оценки моделей машинного обучения. Может содержать текст, изображения, числа и т.д.',
+    analogy: 'Учебник с задачами и ответами: модель «решает» задачи (данные) и сверяется с ответами (метки), чтобы научиться.',
+    exampleCode: `import pandas as pd
+
+# Load dataset
+df = pd.read_csv("housing.csv")
+print(df.shape)       # (20000, 8)
+print(df.head())
+
+# Split into features and target
+X = df.drop("price", axis=1)
+y = df["price"]`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'beginner',
+    relatedTerms: ['ml', 'neural-network', 'data-preprocessing'],
+  },
+  {
+    id: 'reinforcement-learning',
+    title: 'Обучение с подкреплением',
+    definition: 'Метод машинного обучения, при котором агент учится принимать решения, получая награды за правильные действия и штрафы за ошибочные.',
+    analogy: 'Дрессировка собаки: за правильную команду — лакомство (награда), за нежелательное поведение — игнорирование (штраф). Собака сама находит лучшую стратегию.',
+    exampleCode: `# Q-learning pseudocode
+import numpy as np
+
+Q = np.zeros((num_states, num_actions))
+
+for episode in range(1000):
+    state = env.reset()
+    while not done:
+        action = np.argmax(Q[state])  # exploit
+        next_state, reward, done = env.step(action)
+        Q[state, action] += lr * (
+            reward + gamma * np.max(Q[next_state]) - Q[state, action]
+        )
+        state = next_state`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'advanced',
+    relatedTerms: ['ml', 'neural-network', 'supervised-learning'],
+  },
+  {
+    id: 'deep-learning',
+    title: 'Глубокое обучение',
+    definition: 'Подраздел машинного обучения, использующий нейросети с множеством скрытых слоёв. Особенно эффективен для изображений, речи и текста.',
+    analogy: 'Многоэтажное сито: данные проходят через множество фильтров (слоёв), каждый из которых выделяет всё более сложные закономерности.',
+    exampleCode: `import torch
+import torch.nn as nn
+
+class CNN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(1, 32, 3)
+        self.conv2 = nn.Conv2d(32, 64, 3)
+        self.fc = nn.Linear(64 * 5 * 5, 10)
+
+    def forward(self, x):
+        x = torch.relu(self.conv1(x))
+        x = torch.relu(self.conv2(x))
+        return self.fc(x.view(x.size(0), -1))`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'advanced',
+    relatedTerms: ['neural-network', 'ml', 'computer-vision'],
+  },
+  {
+    id: 'nlp',
+    title: 'Обработка естественного языка (NLP)',
+    definition: 'Область ИИ, занимающаяся анализом, пониманием и генерацией человеческого языка компьютером.',
+    analogy: 'Переводчик-полиглот: компьютер учится понимать человеческую речь так же, как переводчик осваивает иностранные языки — через практику с большим количеством текстов.',
+    exampleCode: `from transformers import pipeline
+
+# Sentiment analysis
+classifier = pipeline("sentiment-analysis")
+result = classifier("I love this product!")
+print(result)
+# [{'label': 'POSITIVE', 'score': 0.9998}]
+
+# Text generation
+generator = pipeline("text-generation", model="gpt2")
+text = generator("AI is", max_length=30)
+print(text[0]["generated_text"])`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'intermediate',
+    relatedTerms: ['neural-network', 'deep-learning', 'transformer'],
+  },
+  {
+    id: 'computer-vision',
+    title: 'Компьютерное зрение',
+    definition: 'Область ИИ, обучающая компьютеры «видеть» — распознавать объекты, лица и сцены на изображениях и видео.',
+    analogy: 'Охранник на входе: он смотрит на лицо (изображение), сверяет с базой (обученная модель) и решает — пропустить или нет.',
+    exampleCode: `import cv2
+
+# Load image and detect faces
+face_cascade = cv2.CascadeClassifier(
+    "haarcascade_frontalface_default.xml"
+)
+img = cv2.imread("photo.jpg")
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+print(f"Found {len(faces)} face(s)")`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'intermediate',
+    relatedTerms: ['deep-learning', 'neural-network', 'dataset'],
+  },
+  {
+    id: 'transformer',
+    title: 'Трансформер',
+    definition: 'Архитектура нейросети, основанная на механизме внимания (attention). Лежит в основе GPT, BERT и других современных языковых моделей.',
+    analogy: 'Читатель, который может мгновенно связать любое слово в тексте с любым другим, независимо от расстояния между ними — в отличие от чтения строго слева направо.',
+    exampleCode: `from transformers import AutoTokenizer, AutoModel
+
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+model = AutoModel.from_pretrained("bert-base-uncased")
+
+inputs = tokenizer("Hello, world!", return_tensors="pt")
+outputs = model(**inputs)
+
+# outputs.last_hidden_state shape:
+# (batch_size, sequence_length, hidden_size)
+print(outputs.last_hidden_state.shape)`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'advanced',
+    relatedTerms: ['nlp', 'deep-learning', 'neural-network'],
+  },
+  {
+    id: 'supervised-learning',
+    title: 'Обучение с учителем',
+    definition: 'Тип машинного обучения, при котором модель обучается на размеченных данных — парах «вход → правильный ответ».',
+    analogy: 'Школьные контрольные с ответами: ученик (модель) решает задачи и сразу проверяет себя по ключу (метки), чтобы учиться на своих ошибках.',
+    exampleCode: `from sklearn.linear_model import LinearRegression
+
+# Supervised: X (features) -> y (labels)
+X = [[1], [2], [3], [4], [5]]
+y = [2, 4, 6, 8, 10]
+
+model = LinearRegression()
+model.fit(X, y)
+
+prediction = model.predict([[6]])
+print(f"Prediction for 6: {prediction[0]}")  # ~12.0`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'beginner',
+    relatedTerms: ['ml', 'dataset', 'unsupervised-learning'],
+  },
+  {
+    id: 'unsupervised-learning',
+    title: 'Обучение без учителя',
+    definition: 'Тип машинного обучения, при котором модель ищет скрытые структуры и паттерны в неразмеченных данных без заранее известных ответов.',
+    analogy: 'Сортировка монет без подписей: вы раскладываете их по кучкам (кластерам) по внешним признакам — размеру, цвету, весу — не зная названий.',
+    exampleCode: `from sklearn.cluster import KMeans
+import numpy as np
+
+# Unsupervised: no labels, find clusters
+data = np.random.rand(100, 2)
+
+kmeans = KMeans(n_clusters=3)
+kmeans.fit(data)
+
+print("Cluster centers:", kmeans.cluster_centers_)
+print("Labels:", kmeans.labels_[:10])`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'intermediate',
+    relatedTerms: ['ml', 'supervised-learning', 'dataset'],
+  },
+  {
+    id: 'overfitting',
+    title: 'Переобучение',
+    definition: 'Ситуация, когда модель слишком хорошо запоминает обучающие данные и теряет способность обобщать — плохо работает на новых данных.',
+    analogy: 'Студент, который зубрит ответы к тесту наизусть: на знакомых вопросах он отвечает идеально, но на новых — теряется.',
+    exampleCode: `from sklearn.model_selection import cross_val_score
+from sklearn.tree import DecisionTreeClassifier
+
+# Overfitting: tree memorizes training data
+tree = DecisionTreeClassifier(max_depth=None)
+tree.fit(X_train, y_train)
+print("Train:", tree.score(X_train, y_train))  # 1.00
+print("Test:", tree.score(X_test, y_test))      # 0.72
+
+# Fix: limit depth (regularization)
+tree = DecisionTreeClassifier(max_depth=5)
+tree.fit(X_train, y_train)
+print("Train:", tree.score(X_train, y_train))  # 0.88
+print("Test:", tree.score(X_test, y_test))      # 0.85`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'intermediate',
+    relatedTerms: ['ml', 'dataset', 'supervised-learning'],
+  },
+  {
+    id: 'data-preprocessing',
+    title: 'Предобработка данных',
+    definition: 'Этап подготовки сырых данных перед обучением модели: очистка, нормализация, заполнение пропусков и преобразование форматов.',
+    analogy: 'Подготовка ингредиентов перед готовкой: овощи нужно помыть, почистить и нарезать, прежде чем класть в кастрюлю.',
+    exampleCode: `import pandas as pd
+from sklearn.preprocessing import StandardScaler
+
+df = pd.read_csv("data.csv")
+
+# Handle missing values
+df.fillna(df.mean(), inplace=True)
+
+# Normalize features
+scaler = StandardScaler()
+df[["age", "salary"]] = scaler.fit_transform(
+    df[["age", "salary"]]
+)
+print(df.describe())`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'beginner',
+    relatedTerms: ['dataset', 'ml', 'overfitting'],
+  },
+  {
+    id: 'generative-ai',
+    title: 'Генеративный ИИ',
+    definition: 'Модели ИИ, способные создавать новый контент — текст, изображения, музыку, код — на основе обученных паттернов.',
+    analogy: 'Художник, который изучил тысячи картин и теперь рисует собственные произведения в любом стиле — не копируя, а создавая нечто новое.',
+    exampleCode: `import openai
+
+response = openai.ChatCompletion.create(
+    model="gpt-4",
+    messages=[
+        {"role": "system", "content": "You are a poet."},
+        {"role": "user", "content": "Write a haiku about AI"}
+    ]
+)
+
+print(response.choices[0].message.content)
+# Silicon minds dream
+# Patterns woven from our words
+# New worlds start to bloom`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'beginner',
+    relatedTerms: ['transformer', 'deep-learning', 'nlp'],
+  },
+  {
+    id: 'gradient-descent',
+    title: 'Градиентный спуск',
+    definition: 'Оптимизационный алгоритм, который итеративно корректирует параметры модели в направлении наименьшей ошибки, «спускаясь» по поверхности функции потерь.',
+    analogy: 'Спуск с горы в тумане: вы не видите подножия, но чувствуете наклон под ногами и всегда шагаете вниз, пока не окажетесь в долине.',
+    exampleCode: `import numpy as np
+
+def gradient_descent(X, y, lr=0.01, epochs=1000):
+    w = np.zeros(X.shape[1])
+    b = 0
+    for _ in range(epochs):
+        pred = X @ w + b
+        error = pred - y
+        w -= lr * (2/len(y)) * (X.T @ error)
+        b -= lr * (2/len(y)) * error.sum()
+    return w, b
+
+w, b = gradient_descent(X_train, y_train)
+print("Weights:", w)`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'advanced',
+    relatedTerms: ['neural-network', 'ml', 'overfitting'],
+  },
+  {
+    id: 'ai-model',
+    title: 'Модель ИИ',
+    definition: 'Математическая структура, обученная на данных для выполнения конкретной задачи: классификации, предсказания, генерации и т.д.',
+    analogy: 'Выпускник университета: он прошёл обучение (тренировку на данных), получил диплом (обученные веса) и теперь может применять знания на практике.',
+    exampleCode: `import joblib
+from sklearn.ensemble import GradientBoostingClassifier
+
+# Train model
+model = GradientBoostingClassifier()
+model.fit(X_train, y_train)
+
+# Save model
+joblib.dump(model, "model.pkl")
+
+# Load and use model later
+loaded = joblib.load("model.pkl")
+predictions = loaded.predict(X_new)
+print("Predictions:", predictions)`,
+    exampleLanguage: 'python',
+    category: 'ai',
+    difficulty: 'beginner',
+    relatedTerms: ['ml', 'neural-network', 'dataset'],
+  },
 ];
