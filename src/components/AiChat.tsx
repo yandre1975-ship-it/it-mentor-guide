@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageCircle, X, Send, Bot, User, Loader2, Mic, MicOff } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Loader2, Mic, MicOff, Trash2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
@@ -263,6 +263,16 @@ export function AiChat() {
               <p className="text-sm font-semibold">AI-ассистент</p>
               <p className="text-xs text-muted-foreground">Спросите о терминах, технологиях, процессах</p>
             </div>
+            {messages.length > 0 && (
+              <button
+                onClick={() => setMessages([])}
+                className="p-1 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                aria-label="Очистить историю"
+                title="Очистить историю"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
             <button onClick={() => setOpen(false)} className="p-1 rounded-md hover:bg-secondary transition-colors">
               <X className="h-4 w-4" />
             </button>
