@@ -271,7 +271,7 @@ export function AiChat() {
       }
       setIsLoading(false);
     }
-  }, [input, isLoading, messages]);
+  }, [input, isLoading, messages, pageContext]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -298,7 +298,9 @@ export function AiChat() {
             <Bot className="h-5 w-5 text-primary" />
             <div className="flex-1">
               <p className="text-sm font-semibold">AI-ассистент</p>
-              <p className="text-xs text-muted-foreground">Спросите о терминах, технологиях, процессах</p>
+              <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                {pageContext ? `📍 ${pageContext.slice(0, 60)}…` : 'Спросите о терминах, технологиях, процессах'}
+              </p>
             </div>
             {messages.length > 0 && (
               <button
