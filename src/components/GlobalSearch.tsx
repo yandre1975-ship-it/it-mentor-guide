@@ -106,6 +106,7 @@ export function GlobalSearch() {
             ))}
           </CommandGroup>
 
+          <CommandGroup heading="Процессы">
             {processes.map((p) => (
               <CommandItem key={p.id} onSelect={() => go('/processes')} keywords={[p.title, p.description]}>
                 <Workflow className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
