@@ -18,7 +18,7 @@ export default function Specialties() {
   });
 
   return (
-    <Layout searchQuery={search} onSearchChange={setSearch} showSearch>
+    <Layout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">IT-специальности</h1>

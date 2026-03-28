@@ -42,7 +42,7 @@ const Index = () => {
   const showHero = !search && !selectedCategory && !selectedDifficulty;
 
   return (
-    <Layout searchQuery={search} onSearchChange={setSearch} showSearch>
+    <Layout>
       <div className="space-y-6">
 
         {/* Hero block */}

@@ -32,7 +32,7 @@ const Features = () => {
   const categories = Object.entries(featureCategoryLabels) as [FeatureCategory, string][];
 
   return (
-    <Layout searchQuery={search} onSearchChange={setSearch} showSearch>
+    <Layout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Каталог фич</h1>
