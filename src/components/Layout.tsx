@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Book, Workflow, BrainCircuit, Star, Search, Menu, X, Briefcase, Layers } from 'lucide-react';
+import { Book, Workflow, BrainCircuit, Star, Search, Menu, X, Briefcase, Layers, Zap } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { GlobalSearch } from './GlobalSearch';
 import { useState } from 'react';
@@ -15,6 +15,7 @@ interface LayoutProps {
 const navItems = [
   { to: '/', icon: Book, label: 'Термины' },
   { to: '/specialties', icon: Briefcase, label: 'Специальности' },
+  { to: '/features', icon: Zap, label: 'Фичи' },
   { to: '/prototypes', icon: Layers, label: 'Проекты' },
   { to: '/processes', icon: Workflow, label: 'Процессы' },
   { to: '/quizzes', icon: BrainCircuit, label: 'Квизы' },

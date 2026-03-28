@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Book, Workflow, BrainCircuit, Briefcase, Layers } from 'lucide-react';
+import { Book, Workflow, BrainCircuit, Briefcase, Layers, Zap } from 'lucide-react';
 import {
   CommandDialog,
   CommandEmpty,
@@ -14,6 +14,7 @@ import { processes } from '@/data/processes';
 import { quizzes } from '@/data/quizzes';
 import { specialties } from '@/data/specialties';
 import { prototypes } from '@/data/prototypes';
+import { features } from '@/data/features';
 
 function Highlight({ text, query }: { text: string; query: string }) {
   if (!query.trim()) return <>{text}</>;
@@ -92,6 +93,15 @@ export function GlobalSearch() {
               <CommandItem key={p.id} onSelect={() => go('/prototypes')} keywords={[p.title, p.description]}>
                 <Layers className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
                 <span><Highlight text={p.title} query={query} /></span>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+
+          <CommandGroup heading="Фичи">
+            {features.map((f) => (
+              <CommandItem key={f.id} onSelect={() => go('/features')} keywords={[f.title, f.description]}>
+                <Zap className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                <span><Highlight text={f.title} query={query} /></span>
               </CommandItem>
             ))}
           </CommandGroup>
