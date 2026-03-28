@@ -15,6 +15,8 @@ import {
 import { Input } from '@/components/ui/input';
 import type { PrototypeZone } from '@/data/prototypes';
 import { difficultyLabels } from '@/data/types';
+import { ProjectOverviewPanel } from '@/components/prototypes/ProjectOverviewPanel';
+import { ZoneDetailPanel } from '@/components/prototypes/ZoneDetailPanel';
 
 const complexityConfig = {
   beginner: { label: 'Junior', color: 'bg-[hsl(var(--success))] text-[hsl(var(--success-foreground))]' },
