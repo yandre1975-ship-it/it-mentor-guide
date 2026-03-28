@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import { Zap, ChevronDown, ChevronUp } from 'lucide-react';
+import { MermaidDiagram } from '@/components/MermaidDiagram';
 
 const Features = () => {
   const [search, setSearch] = useState('');
