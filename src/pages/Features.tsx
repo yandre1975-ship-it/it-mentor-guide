@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import { Zap, ChevronDown, ChevronUp } from 'lucide-react';
+import { MermaidDiagram } from '@/components/MermaidDiagram';
 
 const Features = () => {
   const [search, setSearch] = useState('');
@@ -95,6 +96,14 @@ const Features = () => {
 
                 {isExpanded && (
                   <CardContent className="space-y-4 pt-0" onClick={(e) => e.stopPropagation()}>
+                    {/* Diagram */}
+                    <div>
+                      <h4 className="text-sm font-semibold mb-2">Поток данных</h4>
+                      <div className="rounded-lg border bg-card p-4">
+                        <MermaidDiagram chart={feature.diagramCode} />
+                      </div>
+                    </div>
+
                     {/* How it works */}
                     <div>
                       <h4 className="text-sm font-semibold mb-1">Как это работает</h4>

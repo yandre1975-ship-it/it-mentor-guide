@@ -11,6 +11,7 @@ export interface Feature {
   specialistIds: string[];
   tools: string[];
   howItWorks: string;
+  diagramCode: string;
 }
 
 export const featureCategoryLabels: Record<FeatureCategory, string> = {
@@ -46,6 +47,12 @@ export const features: Feature[] = [
     specialistIds: ['backend-developer', 'frontend-developer'],
     tools: ['Firebase Auth', 'Supabase Auth', 'Passport.js', 'bcrypt', 'JWT'],
     howItWorks: 'Пользователь вводит email и пароль → сервер хеширует пароль (bcrypt) → сохраняет в БД → при входе сверяет хеши → выдаёт JWT-токен → клиент сохраняет токен и отправляет с каждым запросом.',
+    diagramCode: `graph LR
+    A[Форма входа] -->|email + пароль| B[Сервер]
+    B -->|bcrypt hash| C[(База данных)]
+    C -->|хеш совпал| D[Генерация JWT]
+    D -->|токен| E[Клиент]
+    E -->|Authorization header| F[Защищённый API]`,
   },
   {
     id: 'auth-oauth',
@@ -57,6 +64,14 @@ export const features: Feature[] = [
     specialistIds: ['backend-developer', 'frontend-developer'],
     tools: ['OAuth 2.0', 'Google Identity', 'NextAuth.js', 'Passport.js'],
     howItWorks: 'Клиент перенаправляет на страницу провайдера → пользователь даёт согласие → провайдер возвращает authorization code → сервер обменивает code на access token → получает профиль пользователя.',
+    diagramCode: `graph LR
+    A[Клиент] -->|redirect| B[OAuth провайдер]
+    B -->|согласие| C[Authorization Code]
+    C -->|code| D[Сервер]
+    D -->|code → token| B
+    B -->|access token| D
+    D -->|профиль| E[(БД пользователей)]
+    D -->|сессия| A`,
   },
   {
     id: 'payments-stripe',
@@ -68,6 +83,15 @@ export const features: Feature[] = [
     specialistIds: ['backend-developer', 'frontend-developer'],
     tools: ['Stripe', 'PayPal', 'YooKassa', 'Webhooks'],
     howItWorks: 'Клиент создаёт PaymentIntent через API → пользователь вводит данные карты → платёжная система обрабатывает транзакцию → webhook уведомляет сервер о результате → обновляется статус заказа.',
+    diagramCode: `graph LR
+    A[Клиент] -->|создать заказ| B[Сервер]
+    B -->|PaymentIntent| C[Stripe API]
+    C -->|client_secret| A
+    A -->|данные карты| C
+    C -->|обработка| D{Результат}
+    D -->|успех| E[Webhook → Сервер]
+    D -->|ошибка| A
+    E -->|обновить статус| F[(БД заказов)]`,
   },
   {
     id: 'push-notifications',
@@ -79,6 +103,13 @@ export const features: Feature[] = [
     specialistIds: ['backend-developer', 'mobile-developer'],
     tools: ['Firebase Cloud Messaging', 'Apple Push Notification', 'OneSignal', 'Service Workers'],
     howItWorks: 'Приложение запрашивает разрешение → получает device token → сервер сохраняет token → при событии отправляет payload через FCM/APNs → устройство показывает уведомление.',
+    diagramCode: `graph LR
+    A[Приложение] -->|запрос разрешения| B[Пользователь]
+    B -->|разрешил| C[Device Token]
+    C -->|сохранить| D[(БД токенов)]
+    E[Событие] -->|триггер| F[Сервер]
+    F -->|payload + token| G[FCM / APNs]
+    G -->|push| H[Устройство]`,
   },
   {
     id: 'realtime-chat',
@@ -90,6 +121,13 @@ export const features: Feature[] = [
     specialistIds: ['backend-developer', 'frontend-developer'],
     tools: ['WebSocket', 'Socket.IO', 'Supabase Realtime', 'Redis Pub/Sub'],
     howItWorks: 'Клиент устанавливает WebSocket-соединение → при отправке сообщения оно транслируется через сервер всем участникам → сообщения сохраняются в БД → при переподключении загружается история.',
+    diagramCode: `graph LR
+    A[Клиент A] -->|WebSocket| B[Сервер]
+    C[Клиент B] -->|WebSocket| B
+    B -->|broadcast| A
+    B -->|broadcast| C
+    B -->|сохранить| D[(БД сообщений)]
+    E[Переподключение] -->|загрузить историю| D`,
   },
   {
     id: 'file-upload',
@@ -101,6 +139,13 @@ export const features: Feature[] = [
     specialistIds: ['backend-developer', 'frontend-developer'],
     tools: ['AWS S3', 'Cloudinary', 'Supabase Storage', 'Multer', 'presigned URLs'],
     howItWorks: 'Клиент выбирает файл → валидация типа и размера → получение presigned URL → прямая загрузка в S3/хранилище → сохранение метаданных в БД → отображение файла по CDN-ссылке.',
+    diagramCode: `graph LR
+    A[Клиент] -->|запрос URL| B[Сервер]
+    B -->|presigned URL| A
+    A -->|upload файл| C[S3 / Storage]
+    C -->|подтверждение| B
+    B -->|метаданные| D[(БД)]
+    C -->|CDN ссылка| E[Отображение]`,
   },
   {
     id: 'search-fulltext',
@@ -112,6 +157,13 @@ export const features: Feature[] = [
     specialistIds: ['backend-developer', 'data-engineer'],
     tools: ['Elasticsearch', 'Algolia', 'MeiliSearch', 'PostgreSQL tsvector'],
     howItWorks: 'Данные индексируются в поисковом движке → при запросе текст токенизируется и нормализуется → движок ищет по инвертированному индексу → результаты ранжируются по TF-IDF/BM25 → возвращается топ совпадений.',
+    diagramCode: `graph LR
+    A[(БД)] -->|индексация| B[Поисковый движок]
+    C[Пользователь] -->|запрос| D[API]
+    D -->|токенизация| B
+    B -->|инвертированный индекс| E[Ранжирование BM25]
+    E -->|топ результатов| D
+    D -->|результаты| C`,
   },
   {
     id: 'dark-mode',
@@ -123,6 +175,13 @@ export const features: Feature[] = [
     specialistIds: ['frontend-developer'],
     tools: ['CSS Variables', 'Tailwind dark:', 'next-themes', 'localStorage'],
     howItWorks: 'CSS-переменные определяют палитру → при переключении меняется data-атрибут на <html> → Tailwind/CSS перезаписывает цвета → предпочтение сохраняется в localStorage → при загрузке читается сохранённое значение.',
+    diagramCode: `graph LR
+    A[Кнопка переключения] -->|toggle| B[data-theme атрибут]
+    B -->|light/dark| C[CSS Variables]
+    C -->|перерисовка| D[UI компоненты]
+    A -->|сохранить| E[localStorage]
+    F[Загрузка страницы] -->|прочитать| E
+    E -->|восстановить| B`,
   },
   {
     id: 'infinite-scroll',
@@ -134,6 +193,13 @@ export const features: Feature[] = [
     specialistIds: ['frontend-developer', 'backend-developer'],
     tools: ['Intersection Observer', 'React Query', 'Cursor Pagination', 'Virtual Lists'],
     howItWorks: 'Intersection Observer отслеживает видимость «сторожевого» элемента → при попадании в viewport запрашивается следующая страница → API возвращает данные с cursor → новые элементы добавляются к списку.',
+    diagramCode: `graph LR
+    A[Список элементов] -->|скролл вниз| B[Sentinel элемент]
+    B -->|Intersection Observer| C{В viewport?}
+    C -->|да| D[Запрос API cursor=X]
+    D -->|данные + next cursor| E[Добавить к списку]
+    E --> A
+    C -->|нет| A`,
   },
   {
     id: 'ci-cd',
@@ -145,6 +211,14 @@ export const features: Feature[] = [
     specialistIds: ['devops-engineer', 'backend-developer'],
     tools: ['GitHub Actions', 'GitLab CI', 'Jenkins', 'Docker', 'Kubernetes'],
     howItWorks: 'Push в репозиторий → CI запускает линтеры и тесты → при успехе собирается Docker-образ → образ пушится в registry → CD деплоит на staging → после ревью деплой на production.',
+    diagramCode: `graph LR
+    A[Git Push] -->|триггер| B[CI: Lint + Тесты]
+    B -->|успех| C[Docker Build]
+    C -->|push| D[Container Registry]
+    D -->|deploy| E[Staging]
+    E -->|ревью| F{Одобрено?}
+    F -->|да| G[Production]
+    F -->|нет| A`,
   },
   {
     id: 'caching',
@@ -156,6 +230,13 @@ export const features: Feature[] = [
     specialistIds: ['backend-developer', 'devops-engineer'],
     tools: ['Redis', 'Memcached', 'CDN', 'HTTP Cache-Control', 'React Query'],
     howItWorks: 'Запрос приходит → проверяется наличие в кеше (cache hit) → если есть — возвращается мгновенно → если нет — запрос к БД → результат сохраняется в кеш с TTL → при изменении данных кеш инвалидируется.',
+    diagramCode: `graph LR
+    A[Запрос] -->|проверка| B{Кеш}
+    B -->|cache hit| C[Мгновенный ответ]
+    B -->|cache miss| D[(База данных)]
+    D -->|данные| E[Сохранить в кеш + TTL]
+    E -->|ответ| C
+    F[Изменение данных] -->|invalidate| B`,
   },
   {
     id: 'ai-chatbot',
@@ -167,6 +248,13 @@ export const features: Feature[] = [
     specialistIds: ['ml-engineer', 'backend-developer', 'frontend-developer'],
     tools: ['OpenAI API', 'LangChain', 'Vercel AI SDK', 'Streaming SSE'],
     howItWorks: 'Пользователь вводит сообщение → формируется промпт с контекстом → запрос к LLM API → модель генерирует ответ токен за токеном → streaming через SSE отображает ответ в реальном времени.',
+    diagramCode: `graph LR
+    A[Пользователь] -->|сообщение| B[Сервер]
+    B -->|контекст + промпт| C[LLM API]
+    C -->|токены SSE| B
+    B -->|streaming| D[UI чата]
+    B -->|сохранить| E[(История диалога)]
+    E -->|контекст| B`,
   },
   {
     id: 'image-recognition',
@@ -178,6 +266,13 @@ export const features: Feature[] = [
     specialistIds: ['ml-engineer', 'data-scientist'],
     tools: ['TensorFlow', 'PyTorch', 'YOLO', 'Google Vision API', 'Tesseract OCR'],
     howItWorks: 'Пользователь загружает изображение → предобработка (ресайз, нормализация) → прогон через CNN-модель → модель выдаёт предсказание (класс, bounding box, текст) → результат возвращается клиенту.',
+    diagramCode: `graph LR
+    A[Загрузка изображения] -->|файл| B[Предобработка]
+    B -->|ресайз + нормализация| C[CNN модель]
+    C -->|inference| D{Результат}
+    D -->|классификация| E[Класс объекта]
+    D -->|детекция| F[Bounding Boxes]
+    D -->|OCR| G[Извлечённый текст]`,
   },
   {
     id: 'email-sending',
@@ -189,6 +284,12 @@ export const features: Feature[] = [
     specialistIds: ['backend-developer'],
     tools: ['SendGrid', 'Resend', 'Postmark', 'Nodemailer', 'MJML'],
     howItWorks: 'Событие триггерит отправку (регистрация, покупка) → сервер формирует HTML из шаблона → отправляет через SMTP/API провайдера → провайдер доставляет письмо → webhook сообщает о доставке/открытии.',
+    diagramCode: `graph LR
+    A[Событие] -->|триггер| B[Сервер]
+    B -->|шаблон + данные| C[HTML письмо]
+    C -->|SMTP/API| D[Email провайдер]
+    D -->|доставка| E[Почтовый ящик]
+    D -->|webhook| F[Статус: доставлено / открыто]`,
   },
   {
     id: 'analytics',
@@ -200,5 +301,11 @@ export const features: Feature[] = [
     specialistIds: ['frontend-developer', 'data-analyst'],
     tools: ['Google Analytics', 'Mixpanel', 'PostHog', 'Amplitude', 'Segment'],
     howItWorks: 'SDK встраивается в клиент → при действии пользователя отправляется событие (track) → события накапливаются в хранилище → строятся дашборды с метриками → анализируются воронки и ретеншн.',
+    diagramCode: `graph LR
+    A[Действие пользователя] -->|track event| B[Analytics SDK]
+    B -->|отправка| C[Сервер аналитики]
+    C -->|накопление| D[(Хранилище событий)]
+    D -->|агрегация| E[Дашборды]
+    E -->|воронки, ретеншн| F[Бизнес-решения]`,
   },
 ];
