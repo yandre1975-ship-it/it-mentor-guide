@@ -8,9 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Layers, User, Wrench, BookOpen, X, AlertTriangle, CheckCircle2,
-  Lightbulb, ArrowRight, Target, Package, Link2, BarChart3,
-  Users, GitBranch, Eye, ChevronDown, ChevronUp, Search
+  Layers, ArrowRight, BarChart3,
+  Users, GitBranch, Search
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import type { PrototypeZone } from '@/data/prototypes';
