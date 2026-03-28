@@ -7,6 +7,7 @@ import { toast } from '@/hooks/use-toast';
 type Msg = { role: 'user' | 'assistant'; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
 async function streamChat({
   messages,
@@ -69,6 +70,99 @@ async function streamChat({
   }
 
   onDone();
+}
+
+function ChatInput({
+  input,
+  setInput,
+  onSend,
+  onKeyDown,
+  isLoading,
+  inputRef,
+}: {
+  input: string;
+  setInput: (v: string) => void;
+  onSend: () => void;
+  onKeyDown: (e: React.KeyboardEvent) => void;
+  isLoading: boolean;
+  inputRef: React.RefObject<HTMLTextAreaElement>;
+}) {
+  const [listening, setListening] = useState(false);
+  const recRef = useRef<any>(null);
+
+  const stopListening = useCallback(() => {
+    recRef.current?.stop();
+    recRef.current = null;
+    setListening(false);
+  }, []);
+
+  const toggleVoice = useCallback(() => {
+    if (listening) { stopListening(); return; }
+    if (!SpeechRecognition) {
+      toast({ title: 'Голосовой ввод недоступен', description: 'Попробуйте Chrome или Edge.', variant: 'destructive' });
+      return;
+    }
+    const rec = new SpeechRecognition();
+    rec.lang = 'ru-RU';
+    rec.interimResults = true;
+    rec.continuous = false;
+    rec.onresult = (e: any) => {
+      const transcript = Array.from(e.results).map((r: any) => r[0].transcript).join('');
+      setInput(transcript);
+    };
+    rec.onerror = () => stopListening();
+    rec.onend = () => setListening(false);
+    recRef.current = rec;
+    rec.start();
+    setListening(true);
+  }, [listening, stopListening, setInput]);
+
+  return (
+    <div className="border-t p-3">
+      {listening && (
+        <div className="flex items-center gap-2 px-2 pb-2 text-xs text-muted-foreground">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-destructive" />
+          </span>
+          Говорите...
+        </div>
+      )}
+      <div className="flex items-end gap-2">
+        <textarea
+          ref={inputRef}
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder="Задайте вопрос..."
+          rows={1}
+          className="flex-1 resize-none rounded-xl border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground max-h-24"
+          style={{ minHeight: '40px' }}
+        />
+        {SpeechRecognition && (
+          <button
+            onClick={toggleVoice}
+            aria-label={listening ? 'Остановить запись' : 'Голосовой ввод'}
+            className={`shrink-0 h-10 w-10 rounded-xl flex items-center justify-center transition-colors ${
+              listening
+                ? 'bg-destructive/10 text-destructive animate-pulse'
+                : 'text-muted-foreground hover:text-foreground hover:bg-secondary border'
+            }`}
+          >
+            {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+          </button>
+        )}
+        <Button
+          size="icon"
+          onClick={onSend}
+          disabled={!input.trim() || isLoading}
+          className="shrink-0 h-10 w-10 rounded-xl"
+        >
+          <Send className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 export function AiChat() {
@@ -136,7 +230,6 @@ export function AiChat() {
 
   return (
     <>
-      {/* Floating button */}
       {!open && (
         <button
           onClick={() => setOpen(true)}
@@ -147,10 +240,8 @@ export function AiChat() {
         </button>
       )}
 
-      {/* Chat panel */}
       {open && (
         <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 w-[calc(100vw-2rem)] md:w-[420px] h-[500px] md:h-[560px] rounded-2xl border bg-card shadow-2xl flex flex-col overflow-hidden no-print animate-in slide-in-from-bottom-4 fade-in duration-300">
-          {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 border-b bg-primary/5">
             <Bot className="h-5 w-5 text-primary" />
             <div className="flex-1">
@@ -162,7 +253,6 @@ export function AiChat() {
             </button>
           </div>
 
-          {/* Messages */}
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground gap-3">
@@ -175,7 +265,7 @@ export function AiChat() {
                   {['Что такое API?', 'Чем занимается тестировщик?', 'Объясни CI/CD'].map(q => (
                     <button
                       key={q}
-                      onClick={() => { setInput(q); }}
+                      onClick={() => setInput(q)}
                       className="text-xs px-3 py-1.5 rounded-full border bg-secondary/50 hover:bg-secondary transition-colors"
                     >
                       {q}
@@ -227,7 +317,6 @@ export function AiChat() {
             )}
           </div>
 
-          {/* Input */}
           <ChatInput
             input={input}
             setInput={setInput}
