@@ -15,6 +15,7 @@ interface LayoutProps {
 const navItems = [
   { to: '/', icon: Book, label: 'Термины' },
   { to: '/specialties', icon: Briefcase, label: 'Специальности' },
+  { to: '/features', icon: Zap, label: 'Фичи' },
   { to: '/prototypes', icon: Layers, label: 'Проекты' },
   { to: '/processes', icon: Workflow, label: 'Процессы' },
   { to: '/quizzes', icon: BrainCircuit, label: 'Квизы' },
