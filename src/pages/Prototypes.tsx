@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
-import { prototypes } from '@/data/prototypes';
+import { prototypes, layerConfig } from '@/data/prototypes';
 import { terms } from '@/data/terms';
 import { specialties } from '@/data/specialties';
 import { Badge } from '@/components/ui/badge';
@@ -9,13 +9,16 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Layers, ArrowRight, BarChart3,
-  Users, GitBranch, Search
+  Users, GitBranch, Search, GitCompare, Trophy, Hammer
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import type { PrototypeZone } from '@/data/prototypes';
-import { difficultyLabels } from '@/data/types';
+import type { PrototypeZone, ZoneLayer } from '@/data/prototypes';
 import { ProjectOverviewPanel } from '@/components/prototypes/ProjectOverviewPanel';
 import { ZoneDetailPanel } from '@/components/prototypes/ZoneDetailPanel';
+import { MobileZoneList } from '@/components/prototypes/MobileZoneList';
+import { CompareProjects } from '@/components/prototypes/CompareProjects';
+import { ProgressDashboard } from '@/components/prototypes/ProgressDashboard';
+import { ProjectConstructor } from '@/components/prototypes/ProjectConstructor';
 
 const complexityConfig = {
   beginner: { label: 'Junior', color: 'bg-[hsl(var(--success))] text-[hsl(var(--success-foreground))]' },
@@ -30,6 +33,7 @@ const zoneComplexity = {
 };
 
 type ViewMode = 'structure' | 'roles' | 'complexity' | 'dependencies';
+type OverlayPanel = 'compare' | 'progress' | 'constructor' | null;
 
 // ─── Enhanced Visual Schema ─────────────────────────────────────────────────
 function PrototypeVisual({ zones, activeZone, onSelect, viewMode, highlightSpecialist }: {
@@ -76,8 +80,54 @@ function PrototypeVisual({ zones, activeZone, onSelect, viewMode, highlightSpeci
     return edges;
   }, [zones, viewMode, activeZone]);
 
+  // Compute layer boundaries for visual grouping
+  const layerGroups = useMemo(() => {
+    if (viewMode !== 'structure') return [];
+    const map = new Map<ZoneLayer, { minY: number; maxY: number; maxH: number }>();
+    zones.forEach(z => {
+      if (!z.layer) return;
+      const existing = map.get(z.layer);
+      const bottom = z.y + z.height;
+      if (existing) {
+        existing.minY = Math.min(existing.minY, z.y);
+        existing.maxY = Math.max(existing.maxY, bottom);
+      } else {
+        map.set(z.layer, { minY: z.y, maxY: bottom, maxH: 0 });
+      }
+    });
+    return Array.from(map.entries())
+      .map(([layer, bounds]) => ({ layer, ...bounds }))
+      .sort((a, b) => a.minY - b.minY);
+  }, [zones, viewMode]);
+
   return (
     <div className="relative w-full rounded-xl border-2 border-border bg-muted/20 overflow-hidden" style={{ paddingBottom: '55%' }}>
+      {/* Layer group labels */}
+      {layerGroups.map(({ layer, minY, maxY }) => {
+        const cfg = layerConfig[layer];
+        return (
+          <div
+            key={layer}
+            className="absolute left-0 z-[1] flex items-center pointer-events-none"
+            style={{
+              top: `${minY + 0.5}%`,
+              height: `${maxY - minY - 1}%`,
+            }}
+          >
+            <div
+              className="h-full w-1 rounded-r-full opacity-60"
+              style={{ backgroundColor: cfg.color }}
+            />
+            <span
+              className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wider -rotate-90 origin-left whitespace-nowrap ml-2.5 opacity-50"
+              style={{ color: cfg.color }}
+            >
+              {cfg.icon} {cfg.label}
+            </span>
+          </div>
+        );
+      })}
+
       {/* SVG dependency lines */}
       {dependencyEdges.length > 0 && (
         <svg className="absolute inset-0 w-full h-full z-[5] pointer-events-none" preserveAspectRatio="none">
@@ -161,7 +211,6 @@ function PrototypeVisual({ zones, activeZone, onSelect, viewMode, highlightSpeci
   );
 }
 
-// ZoneDetailPanel moved to src/components/prototypes/ZoneDetailPanel.tsx
 // ─── Team Block ─────────────────────────────────────────────────────────────
 function TeamBlock({ zones, activeZone }: { zones: PrototypeZone[]; activeZone: string | null }) {
   const allSpecIds = [...new Set(zones.flatMap((z) => z.specialists))];
@@ -209,11 +258,26 @@ function TeamBlock({ zones, activeZone }: { zones: PrototypeZone[]; activeZone: 
 
 // ─── Main Page ──────────────────────────────────────────────────────────────
 export default function Prototypes() {
-  const [selectedPrototype, setSelectedPrototype] = useState(prototypes[0].id);
-  const [activeZone, setActiveZone] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Deep link: read initial state from URL
+  const initialProject = searchParams.get('project') || prototypes[0].id;
+  const initialZone = searchParams.get('zone') || null;
+
+  const [selectedPrototype, setSelectedPrototype] = useState(initialProject);
+  const [activeZone, setActiveZone] = useState<string | null>(initialZone);
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('structure');
   const [highlightSpecialist, setHighlightSpecialist] = useState<string | null>(null);
+  const [overlayPanel, setOverlayPanel] = useState<OverlayPanel>(null);
+
+  // Deep link: sync state to URL
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (selectedPrototype !== prototypes[0].id) params.set('project', selectedPrototype);
+    if (activeZone) params.set('zone', activeZone);
+    setSearchParams(params, { replace: true });
+  }, [selectedPrototype, activeZone, setSearchParams]);
 
   const filtered = prototypes.filter((p) => {
     if (!search) return true;
@@ -235,6 +299,12 @@ export default function Prototypes() {
     return specialties.filter(s => ids.includes(s.id));
   }, [current]);
 
+  const selectProject = (id: string) => {
+    setSelectedPrototype(id);
+    setActiveZone(null);
+    setHighlightSpecialist(null);
+  };
+
   return (
     <Layout>
       <div className="space-y-5">
@@ -246,16 +316,48 @@ export default function Prototypes() {
               Изучайте архитектуру реальных IT-проектов: блоки, роли, инструменты и зависимости
             </p>
           </div>
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Найти проект..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 h-9"
-            />
+          <div className="flex items-center gap-2">
+            {/* Sprint 4 tools */}
+            <div className="flex gap-1">
+              {[
+                { key: 'compare' as const, icon: GitCompare, label: 'Сравнить' },
+                { key: 'progress' as const, icon: Trophy, label: 'Прогресс' },
+                { key: 'constructor' as const, icon: Hammer, label: 'Конструктор' },
+              ].map(({ key, icon: Icon, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setOverlayPanel(overlayPanel === key ? null : key)}
+                  className={`p-2 rounded-lg border text-xs transition-colors ${
+                    overlayPanel === key
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'hover:bg-muted border-border'
+                  }`}
+                  title={label}
+                >
+                  <Icon className="h-4 w-4" />
+                </button>
+              ))}
+            </div>
+            <div className="relative w-full sm:w-52">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Найти проект..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 h-9"
+              />
+            </div>
           </div>
         </div>
+
+        {/* Overlay panels (Sprint 4) */}
+        {overlayPanel && (
+          <div className="rounded-xl border-2 bg-card p-4 animate-in fade-in slide-in-from-top-2 duration-200">
+            {overlayPanel === 'compare' && <CompareProjects onClose={() => setOverlayPanel(null)} />}
+            {overlayPanel === 'progress' && <ProgressDashboard />}
+            {overlayPanel === 'constructor' && <ProjectConstructor onClose={() => setOverlayPanel(null)} />}
+          </div>
+        )}
 
         {/* Project selector */}
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
@@ -265,7 +367,7 @@ export default function Prototypes() {
             return (
               <button
                 key={p.id}
-                onClick={() => { setSelectedPrototype(p.id); setActiveZone(null); setHighlightSpecialist(null); }}
+                onClick={() => selectProject(p.id)}
                 aria-pressed={isSelected}
                 className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${
                   isSelected
@@ -352,12 +454,22 @@ export default function Prototypes() {
         {/* Main grid: Schema + Detail */}
         <div className="grid gap-4 lg:grid-cols-5">
           <div className="lg:col-span-3 space-y-3">
-            <PrototypeVisual
+            {/* Desktop schema */}
+            <div className="hidden md:block">
+              <PrototypeVisual
+                zones={current.zones}
+                activeZone={activeZone}
+                onSelect={setActiveZone}
+                viewMode={viewMode}
+                highlightSpecialist={highlightSpecialist}
+              />
+            </div>
+
+            {/* Mobile accordion list */}
+            <MobileZoneList
               zones={current.zones}
               activeZone={activeZone}
               onSelect={setActiveZone}
-              viewMode={viewMode}
-              highlightSpecialist={highlightSpecialist}
             />
 
             {/* Complexity legend */}
@@ -365,6 +477,18 @@ export default function Prototypes() {
               <div className="flex items-center gap-4 text-xs text-muted-foreground px-1">
                 {Object.entries(zoneComplexity).map(([, v]) => (
                   <span key={v.label} className="flex items-center gap-1">{v.icon} {v.label}</span>
+                ))}
+              </div>
+            )}
+
+            {/* Layer legend (structure mode) */}
+            {viewMode === 'structure' && (
+              <div className="hidden md:flex items-center gap-3 text-[10px] text-muted-foreground px-1">
+                {Object.entries(layerConfig).map(([, cfg]) => (
+                  <span key={cfg.label} className="flex items-center gap-1">
+                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: cfg.color }} />
+                    {cfg.icon} {cfg.label}
+                  </span>
                 ))}
               </div>
             )}
