@@ -139,18 +139,17 @@ export function GlobalSearch() {
       </button>
 
       <CommandDialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setQuery(''); }}>
-        <div className="flex items-center border-b px-3">
+        <div className="relative">
           <CommandInput
             placeholder="Искать термины, процессы, квизы..."
             onValueChange={setQuery}
             value={query}
-            className="border-0 border-none ring-0 focus:ring-0 focus-visible:ring-0"
           />
           {SpeechRecognition && (
             <button
               onClick={toggleVoice}
               aria-label={isListening ? 'Остановить голосовой поиск' : 'Голосовой поиск'}
-              className={`shrink-0 p-2 rounded-md transition-colors ${
+              className={`absolute right-3 top-1/2 -translate-y-1/2 shrink-0 p-1.5 rounded-md transition-colors ${
                 isListening
                   ? 'text-destructive bg-destructive/10 animate-pulse'
                   : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
