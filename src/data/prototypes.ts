@@ -2,14 +2,23 @@ export interface PrototypeZone {
   id: string;
   label: string;
   description: string;
-  x: number; // % from left
-  y: number; // % from top
-  width: number; // % width
-  height: number; // % height
-  color: string; // tailwind border color class
-  terms: string[]; // term IDs
-  specialists: string[]; // specialty IDs from specialties.ts
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
+  terms: string[];
+  specialists: string[];
   tools: string[];
+  // Enriched fields
+  purpose?: string;
+  elements?: string[];
+  mistakes?: string[];
+  bestPractices?: string[];
+  checklist?: string[];
+  dependencies?: string[]; // other zone IDs this depends on
+  artifacts?: string[];
+  complexity?: 'low' | 'medium' | 'high';
 }
 
 export interface ProjectPrototype {
@@ -17,6 +26,8 @@ export interface ProjectPrototype {
   title: string;
   description: string;
   icon: string;
+  complexity?: 'beginner' | 'intermediate' | 'advanced';
+  stages?: string[];
   zones: PrototypeZone[];
 }
 
@@ -26,6 +37,8 @@ export const prototypes: ProjectPrototype[] = [
     title: 'Лендинг (Landing Page)',
     description: 'Одностраничный сайт для продвижения продукта или услуги. Классический первый проект для начинающих.',
     icon: '🌐',
+    complexity: 'beginner',
+    stages: ['Дизайн', 'Вёрстка', 'Контент', 'Запуск'],
     zones: [
       {
         id: 'header',
@@ -36,6 +49,14 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['http', 'dns', 'cache', 'framework'],
         specialists: ['frontend-developer', 'ui-ux-designer'],
         tools: ['HTML/CSS', 'React', 'Figma'],
+        purpose: 'Обеспечить навигацию и брендинг на странице',
+        elements: ['Логотип', 'Навигационное меню', 'CTA-кнопка', 'Бургер-меню (мобильная версия)'],
+        mistakes: ['Слишком много пунктов меню', 'Отсутствие мобильного меню', 'Нет CTA в шапке'],
+        bestPractices: ['Sticky header при скролле', 'Максимум 5-7 пунктов меню', 'Контрастная CTA-кнопка'],
+        checklist: ['Логотип ведёт на главную', 'Меню адаптивно', 'Шапка не перекрывает контент'],
+        dependencies: [],
+        artifacts: ['Макет в Figma', 'Компонент Header'],
+        complexity: 'low',
       },
       {
         id: 'hero',
@@ -46,6 +67,14 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['framework', 'object', 'syntax'],
         specialists: ['frontend-developer', 'ui-ux-designer', 'product-designer'],
         tools: ['React', 'Tailwind CSS', 'Figma', 'After Effects'],
+        purpose: 'Захватить внимание и донести главное ценностное предложение',
+        elements: ['Заголовок H1', 'Подзаголовок', 'CTA-кнопка', 'Фоновое изображение/видео'],
+        mistakes: ['Размытый заголовок без конкретики', 'Нет CTA', 'Слишком много текста', 'Медленная загрузка фона'],
+        bestPractices: ['Один чёткий оффер', 'Контрастная кнопка действия', 'Оптимизированные медиа'],
+        checklist: ['Заголовок понятен за 3 секунды', 'CTA видна без скролла', 'Фон не мешает читабельности'],
+        dependencies: ['header'],
+        artifacts: ['Копирайт текстов', 'Медиа-файлы', 'A/B варианты'],
+        complexity: 'medium',
       },
       {
         id: 'features',
@@ -56,6 +85,14 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['function', 'object', 'module'],
         specialists: ['frontend-developer', 'ui-ux-designer'],
         tools: ['React Components', 'SVG-иконки', 'CSS Grid'],
+        purpose: 'Показать ключевые преимущества продукта',
+        elements: ['3-6 карточек', 'Иконки', 'Заголовки фич', 'Краткие описания'],
+        mistakes: ['Больше 6 карточек', 'Одинаковые иконки', 'Длинные описания'],
+        bestPractices: ['3-4 ключевых преимущества', 'Единый стиль иконок', 'Конкретные выгоды вместо абстракций'],
+        checklist: ['Каждая фича отвечает на «зачем?»', 'Иконки релевантны', 'Сетка адаптивна'],
+        dependencies: ['hero'],
+        artifacts: ['Набор иконок', 'Текстовый контент'],
+        complexity: 'low',
       },
       {
         id: 'api-section',
@@ -66,6 +103,14 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['api', 'http', 'cache', 'sql'],
         specialists: ['backend-developer', 'frontend-developer'],
         tools: ['REST API', 'fetch/axios', 'PostgreSQL'],
+        purpose: 'Отображать актуальные данные с сервера',
+        elements: ['Блок отзывов', 'Таблица цен', 'Счётчики', 'Skeleton-загрузка'],
+        mistakes: ['Нет обработки ошибок загрузки', 'Отсутствие skeleton/loader', 'Незакэшированные данные'],
+        bestPractices: ['Skeleton-состояния при загрузке', 'Graceful degradation при ошибках', 'Кэширование ответов'],
+        checklist: ['Данные загружаются без ошибок', 'Есть fallback-состояние', 'Скорость загрузки < 2с'],
+        dependencies: [],
+        artifacts: ['API-эндпоинты', 'Схема данных'],
+        complexity: 'medium',
       },
       {
         id: 'form',
@@ -76,6 +121,14 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['api', 'variable', 'function', 'testing'],
         specialists: ['frontend-developer', 'backend-developer', 'qa-engineer'],
         tools: ['React Hook Form', 'Zod', 'Supabase'],
+        purpose: 'Конвертировать посетителей в лиды',
+        elements: ['Поля ввода', 'Валидация', 'Кнопка отправки', 'Сообщение об успехе'],
+        mistakes: ['Нет валидации', 'Отсутствие feedback после отправки', 'Спам без капчи'],
+        bestPractices: ['Минимум полей', 'Inline-валидация', 'Чёткий success/error state'],
+        checklist: ['Email валидируется', 'Форма не отправляет дубли', 'Есть защита от спама'],
+        dependencies: ['api-section'],
+        artifacts: ['Схема валидации', 'API-обработчик'],
+        complexity: 'medium',
       },
       {
         id: 'footer',
@@ -86,6 +139,14 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['http', 'dns', 'hosting'],
         specialists: ['frontend-developer'],
         tools: ['HTML', 'CSS'],
+        purpose: 'Предоставить дополнительную навигацию и юридическую информацию',
+        elements: ['Копирайт', 'Ссылки на соцсети', 'Контактные данные', 'Политика конфиденциальности'],
+        mistakes: ['Перегруженный футер', 'Нет ссылки на политику', 'Отсутствие контактов'],
+        bestPractices: ['Минималистичный дизайн', 'Все обязательные ссылки', 'Согласованность с header'],
+        checklist: ['Год копирайта актуален', 'Ссылки работают', 'Есть контактная информация'],
+        dependencies: [],
+        artifacts: ['Юридические тексты'],
+        complexity: 'low',
       },
     ],
   },
@@ -94,6 +155,8 @@ export const prototypes: ProjectPrototype[] = [
     title: 'Мобильное приложение',
     description: 'Приложение для iOS/Android с авторизацией, лентой контента и профилем пользователя.',
     icon: '📱',
+    complexity: 'intermediate',
+    stages: ['Прототип', 'MVP', 'Тестирование', 'Релиз'],
     zones: [
       {
         id: 'auth',
@@ -104,6 +167,14 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['api', 'http', 'variable', 'function'],
         specialists: ['mobile-developer', 'backend-developer', 'security-engineer'],
         tools: ['Firebase Auth', 'JWT', 'React Native'],
+        purpose: 'Безопасная идентификация пользователей',
+        elements: ['Форма логина', 'Форма регистрации', 'OAuth-кнопки', 'Восстановление пароля'],
+        mistakes: ['Хранение токенов в открытом виде', 'Нет refresh-токенов', 'Слабые требования к паролю'],
+        bestPractices: ['Secure storage для токенов', 'Biometric-авторизация', 'Rate limiting попыток'],
+        checklist: ['Токены хранятся безопасно', 'Есть logout', 'Работает восстановление пароля'],
+        dependencies: [],
+        artifacts: ['Схема авторизации', 'Секреты OAuth'],
+        complexity: 'high',
       },
       {
         id: 'feed',
@@ -114,6 +185,14 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['api', 'cache', 'algorithm', 'loop', 'sql'],
         specialists: ['mobile-developer', 'backend-developer'],
         tools: ['FlatList', 'REST API', 'Redis', 'PostgreSQL'],
+        purpose: 'Отображение основного контента приложения',
+        elements: ['Список элементов', 'Pull-to-refresh', 'Пагинация', 'Skeleton-загрузка'],
+        mistakes: ['Загрузка всех данных разом', 'Нет кэширования', 'Отсутствие пустого состояния'],
+        bestPractices: ['Виртуализация списка', 'Оптимистичные обновления', 'Офлайн-кэш'],
+        checklist: ['Бесконечный скролл работает', 'Pull-to-refresh обновляет данные', 'Есть empty state'],
+        dependencies: ['auth'],
+        artifacts: ['API-пагинация', 'Кэш-стратегия'],
+        complexity: 'medium',
       },
       {
         id: 'detail',
@@ -124,6 +203,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['object', 'module', 'framework'],
         specialists: ['mobile-developer', 'ui-ux-designer'],
         tools: ['React Native Navigation', 'Figma'],
+        purpose: 'Показать полную информацию о выбранном элементе',
+        elements: ['Медиа-контент', 'Описание', 'Действия (лайк, шеринг)', 'Связанный контент'],
+        mistakes: ['Перегруженный экран', 'Нет кнопки «назад»', 'Медленная загрузка медиа'],
+        bestPractices: ['Ленивая загрузка медиа', 'Shared element transitions', 'Deep linking'],
+        dependencies: ['feed'],
+        complexity: 'medium',
       },
       {
         id: 'push',
@@ -134,6 +219,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['api', 'web-server', 'deploy'],
         specialists: ['backend-developer', 'devops-engineer'],
         tools: ['Firebase Cloud Messaging', 'Node.js'],
+        purpose: 'Возвращать пользователей в приложение',
+        elements: ['Серверная отправка', 'Подписка на топики', 'Настройки уведомлений'],
+        mistakes: ['Слишком частые уведомления', 'Нет настроек отписки', 'Неинформативный текст'],
+        bestPractices: ['Сегментация аудитории', 'A/B тестирование текстов', 'Уважение к настройкам пользователя'],
+        dependencies: ['auth'],
+        complexity: 'high',
       },
       {
         id: 'profile',
@@ -144,6 +235,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['sql', 'api', 'object', 'variable'],
         specialists: ['mobile-developer', 'backend-developer', 'ui-ux-designer'],
         tools: ['AsyncStorage', 'REST API', 'S3/Storage'],
+        purpose: 'Управление персональными данными пользователя',
+        elements: ['Аватар', 'Форма редактирования', 'Настройки приватности', 'Удаление аккаунта'],
+        mistakes: ['Нет подтверждения удаления', 'Отсутствие валидации', 'Сброс данных при ошибке'],
+        bestPractices: ['Оптимистичные обновления', 'Подтверждение опасных действий', 'GDPR-compliance'],
+        dependencies: ['auth'],
+        complexity: 'medium',
       },
       {
         id: 'analytics',
@@ -154,6 +251,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['deploy', 'testing'],
         specialists: ['mobile-developer', 'data-scientist', 'product-manager'],
         tools: ['Firebase Analytics', 'Amplitude', 'Sentry'],
+        purpose: 'Отслеживать поведение пользователей и стабильность приложения',
+        elements: ['Трекинг событий', 'Crash reporting', 'Воронки', 'Retention-отчёты'],
+        mistakes: ['Трекинг всего подряд', 'Нет crash reporting', 'Игнорирование метрик'],
+        bestPractices: ['Продуманная схема событий', 'Алерты на критические ошибки', 'Еженедельный review метрик'],
+        dependencies: [],
+        complexity: 'medium',
       },
     ],
   },
@@ -162,6 +265,8 @@ export const prototypes: ProjectPrototype[] = [
     title: 'Интернет-магазин',
     description: 'Полноценный e-commerce с каталогом, корзиной, оплатой и админкой.',
     icon: '🛒',
+    complexity: 'advanced',
+    stages: ['Каталог', 'Корзина', 'Оплата', 'Админка', 'Деплой'],
     zones: [
       {
         id: 'catalog',
@@ -172,6 +277,14 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['algorithm', 'sql', 'index-db', 'cache', 'api'],
         specialists: ['frontend-developer', 'backend-developer'],
         tools: ['React', 'Elasticsearch', 'PostgreSQL', 'Redis'],
+        purpose: 'Помочь пользователю найти нужный товар',
+        elements: ['Сетка товаров', 'Фильтры', 'Сортировка', 'Поиск', 'Пагинация'],
+        mistakes: ['Медленные фильтры', 'Нет пустого состояния поиска', 'Фильтры сбрасываются при навигации'],
+        bestPractices: ['Фасетный поиск', 'URL-фильтры для шаринга', 'Ленивая загрузка изображений'],
+        checklist: ['Фильтры работают комбинированно', 'Поиск даёт релевантные результаты', 'Изображения оптимизированы'],
+        dependencies: [],
+        artifacts: ['Схема товара', 'Индексы поиска'],
+        complexity: 'high',
       },
       {
         id: 'cart',
@@ -182,6 +295,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['function', 'object', 'variable', 'algorithm'],
         specialists: ['fullstack-developer', 'backend-developer', 'qa-engineer'],
         tools: ['Redux/Zustand', 'Node.js', 'Stripe API'],
+        purpose: 'Провести пользователя от выбора товара до оплаты',
+        elements: ['Список товаров', 'Промокоды', 'Расчёт доставки', 'Итоговая сумма'],
+        mistakes: ['Потеря корзины при обновлении', 'Нет валидации промокодов', 'Скрытые доп. расходы'],
+        bestPractices: ['Сохранение корзины в localStorage', 'Прозрачное ценообразование', 'Guest checkout'],
+        dependencies: ['catalog'],
+        complexity: 'high',
       },
       {
         id: 'payment',
@@ -192,6 +311,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['api', 'http', 'testing'],
         specialists: ['backend-developer', 'security-engineer'],
         tools: ['Stripe', 'YooKassa', 'Webhook', 'HTTPS'],
+        purpose: 'Безопасно принять оплату от пользователя',
+        elements: ['Форма оплаты', 'Webhook-обработчик', 'Квитанции', 'Refund-механизм'],
+        mistakes: ['Хранение данных карт', 'Нет idempotency key', 'Отсутствие webhook-верификации'],
+        bestPractices: ['Stripe Elements / hosted checkout', 'Idempotent запросы', 'Логирование транзакций'],
+        dependencies: ['cart'],
+        complexity: 'high',
       },
       {
         id: 'admin',
@@ -202,6 +327,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['sql', 'api', 'pattern', 'module'],
         specialists: ['fullstack-developer', 'ui-ux-designer', 'system-analyst'],
         tools: ['React Admin', 'Chart.js', 'PostgreSQL'],
+        purpose: 'Управление бизнес-процессами магазина',
+        elements: ['CRUD товаров', 'Управление заказами', 'Статистика продаж', 'Управление пользователями'],
+        mistakes: ['Нет ролевого доступа', 'Отсутствие аудит-лога', 'Возможность удалить все данные'],
+        bestPractices: ['RBAC', 'Soft delete', 'Аудит-лог действий'],
+        dependencies: ['catalog', 'cart', 'payment'],
+        complexity: 'high',
       },
       {
         id: 'devops-infra',
@@ -212,6 +343,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['deploy', 'hosting', 'commit', 'repository'],
         specialists: ['devops-engineer', 'backend-developer'],
         tools: ['Docker', 'Kubernetes', 'GitHub Actions', 'Grafana'],
+        purpose: 'Обеспечить стабильную работу в продакшне',
+        elements: ['CI/CD пайплайн', 'Контейнеры', 'Мониторинг', 'Бэкапы'],
+        mistakes: ['Нет бэкапов', 'Деплой вручную', 'Отсутствие мониторинга'],
+        bestPractices: ['Blue-green деплой', 'Автоматические бэкапы', 'Алерты по метрикам'],
+        dependencies: [],
+        complexity: 'high',
       },
     ],
   },
@@ -220,6 +357,8 @@ export const prototypes: ProjectPrototype[] = [
     title: 'ML-платформа',
     description: 'Сервис с моделями машинного обучения: рекомендации, классификация, предсказания.',
     icon: '🤖',
+    complexity: 'advanced',
+    stages: ['Данные', 'Модель', 'API', 'Дашборд', 'Мониторинг'],
     zones: [
       {
         id: 'data-pipeline',
@@ -230,6 +369,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['dataset', 'data-preprocessing', 'sql', 'algorithm'],
         specialists: ['data-scientist', 'backend-developer'],
         tools: ['Python', 'Pandas', 'Apache Airflow', 'PostgreSQL'],
+        purpose: 'Подготовить качественные данные для обучения модели',
+        elements: ['Коннекторы к источникам', 'Трансформации', 'Валидация данных', 'Хранилище'],
+        mistakes: ['Нет валидации входных данных', 'Отсутствие версионирования датасетов', 'Data leakage'],
+        bestPractices: ['Версионирование данных (DVC)', 'Автоматические проверки качества', 'Документация схемы'],
+        dependencies: [],
+        complexity: 'high',
       },
       {
         id: 'model-training',
@@ -240,6 +385,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['neural-network', 'ml', 'deep-learning', 'gradient-descent', 'overfitting'],
         specialists: ['data-scientist', 'ml-engineer'],
         tools: ['PyTorch', 'TensorFlow', 'Jupyter', 'MLflow'],
+        purpose: 'Создать модель, решающую бизнес-задачу',
+        elements: ['Эксперименты', 'Метрики качества', 'Cross-validation', 'Чекпоинты'],
+        mistakes: ['Overfitting', 'Нет baseline-модели', 'Непродуктивные эксперименты'],
+        bestPractices: ['Начинать с простой модели', 'Логировать все эксперименты', 'Reproducibility'],
+        dependencies: ['data-pipeline'],
+        complexity: 'high',
       },
       {
         id: 'model-api',
@@ -250,6 +401,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['api', 'http', 'ai-model', 'microservice'],
         specialists: ['ml-engineer', 'backend-developer'],
         tools: ['FastAPI', 'Docker', 'ONNX', 'TorchServe'],
+        purpose: 'Сделать модель доступной для других сервисов',
+        elements: ['REST эндпоинты', 'Сериализация', 'Rate limiting', 'Версионирование'],
+        mistakes: ['Нет версионирования API', 'Отсутствие rate limiting', 'Синхронные тяжёлые запросы'],
+        bestPractices: ['Async обработка', 'Health checks', 'Swagger документация'],
+        dependencies: ['model-training'],
+        complexity: 'high',
       },
       {
         id: 'frontend-dash',
@@ -260,6 +417,10 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['framework', 'api', 'object'],
         specialists: ['frontend-developer', 'product-designer', 'data-scientist'],
         tools: ['React', 'D3.js/Recharts', 'Figma'],
+        purpose: 'Визуализировать результаты работы ML-моделей',
+        elements: ['Графики метрик', 'Таблицы предсказаний', 'Фильтры', 'Экспорт данных'],
+        dependencies: ['model-api'],
+        complexity: 'medium',
       },
       {
         id: 'monitoring-ml',
@@ -270,6 +431,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['deploy', 'testing', 'overfitting'],
         specialists: ['ml-engineer', 'devops-engineer'],
         tools: ['Prometheus', 'Grafana', 'MLflow', 'Kubernetes'],
+        purpose: 'Поддерживать качество модели в продакшне',
+        elements: ['Data drift detection', 'Алерты', 'Auto-retrain pipeline', 'A/B тестирование'],
+        mistakes: ['Нет мониторинга дрейфа', 'Ручное дообучение', 'Отсутствие rollback'],
+        bestPractices: ['Автоматический мониторинг дрейфа', 'Shadow deployment', 'Canary releases'],
+        dependencies: ['model-api', 'data-pipeline'],
+        complexity: 'high',
       },
     ],
   },
@@ -278,6 +445,8 @@ export const prototypes: ProjectPrototype[] = [
     title: 'SaaS-платформа',
     description: 'Облачный B2B-сервис с подпиской, мультитенантностью и интеграциями.',
     icon: '☁️',
+    complexity: 'advanced',
+    stages: ['MVP', 'Биллинг', 'Интеграции', 'Масштабирование'],
     zones: [
       {
         id: 'auth-saas',
@@ -288,6 +457,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['api', 'http', 'pattern'],
         specialists: ['backend-developer', 'security-engineer'],
         tools: ['Auth0/Supabase Auth', 'RBAC', 'OAuth 2.0'],
+        purpose: 'Безопасный доступ с разграничением по ролям',
+        elements: ['SSO', 'Мультитенантность', 'Роли и разрешения', 'Инвайты'],
+        mistakes: ['Privilege escalation', 'Нет аудит-лога', 'Роли на клиенте'],
+        bestPractices: ['RBAC в отдельной таблице', 'Аудит-лог всех действий', 'SSO для enterprise'],
+        dependencies: [],
+        complexity: 'high',
       },
       {
         id: 'billing',
@@ -298,6 +473,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['api', 'sql', 'function'],
         specialists: ['backend-developer', 'product-manager'],
         tools: ['Stripe', 'PostgreSQL', 'Webhooks'],
+        purpose: 'Монетизация продукта через подписочную модель',
+        elements: ['Тарифы', 'Checkout', 'Инвойсы', 'Trial', 'Downgrade/Upgrade'],
+        mistakes: ['Нет grace period', 'Потеря данных при downgrade', 'Нет email-уведомлений'],
+        bestPractices: ['Прозрачные тарифы', 'Webhook для синхронизации статуса', 'Dunning management'],
+        dependencies: ['auth-saas'],
+        complexity: 'high',
       },
       {
         id: 'core-features',
@@ -308,6 +489,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['framework', 'module', 'pattern', 'microservice', 'sql'],
         specialists: ['fullstack-developer', 'ui-ux-designer', 'system-analyst', 'product-manager'],
         tools: ['React', 'Node.js', 'PostgreSQL', 'WebSocket'],
+        purpose: 'Основная ценность продукта для пользователей',
+        elements: ['Workspace', 'Проекты', 'Realtime collaboration', 'Permissions'],
+        mistakes: ['Монолитная архитектура', 'Нет offline-поддержки', 'Data isolation нарушен'],
+        bestPractices: ['Модульная архитектура', 'Tenant isolation', 'Feature flags'],
+        dependencies: ['auth-saas', 'billing'],
+        complexity: 'high',
       },
       {
         id: 'integrations',
@@ -318,6 +505,10 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['api', 'http', 'web-server'],
         specialists: ['backend-developer', 'system-analyst'],
         tools: ['REST/GraphQL', 'Swagger', 'Zapier'],
+        purpose: 'Расширить функциональность через внешние сервисы',
+        elements: ['Public API', 'Webhooks', 'OAuth apps', 'SDK'],
+        dependencies: ['core-features'],
+        complexity: 'high',
       },
       {
         id: 'analytics-saas',
@@ -328,6 +519,10 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['sql', 'algorithm', 'cache'],
         specialists: ['data-scientist', 'frontend-developer', 'product-manager'],
         tools: ['ClickHouse', 'Recharts', 'Metabase'],
+        purpose: 'Предоставить клиентам инсайты об использовании',
+        elements: ['Дашборды', 'Отчёты', 'Экспорт', 'Кастомные метрики'],
+        dependencies: ['core-features'],
+        complexity: 'medium',
       },
       {
         id: 'infra-saas',
@@ -338,6 +533,10 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['hosting', 'deploy', 'microservice', 'cache'],
         specialists: ['devops-engineer', 'backend-developer'],
         tools: ['AWS/GCP', 'Kubernetes', 'Terraform', 'CloudFlare'],
+        purpose: 'Обеспечить надёжность и производительность при росте',
+        elements: ['Auto-scaling', 'CDN', 'Бэкапы', 'Disaster recovery'],
+        dependencies: [],
+        complexity: 'high',
       },
     ],
   },
@@ -346,6 +545,8 @@ export const prototypes: ProjectPrototype[] = [
     title: 'AI-ассистент (чат-бот)',
     description: 'Интеллектуальный чат-бот на базе LLM: понимает контекст, отвечает на вопросы, генерирует тексты и работает с документами.',
     icon: '🧠',
+    complexity: 'advanced',
+    stages: ['Чат UI', 'LLM интеграция', 'RAG', 'Безопасность', 'Деплой'],
     zones: [
       {
         id: 'chat-ui',
@@ -356,6 +557,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['framework', 'api', 'function', 'object'],
         specialists: ['frontend-developer', 'ui-ux-designer'],
         tools: ['React', 'Tailwind CSS', 'Server-Sent Events', 'Markdown'],
+        purpose: 'Удобный интерфейс для общения с AI',
+        elements: ['Поле ввода', 'Bubble-сообщения', 'Markdown-рендер', 'Typing indicator'],
+        mistakes: ['Нет стриминга', 'Блокировка UI при запросе', 'Отсутствие error state'],
+        bestPractices: ['Token-by-token стриминг', 'Skeleton при загрузке', 'Копирование ответов'],
+        dependencies: [],
+        complexity: 'medium',
       },
       {
         id: 'prompt-engineering',
@@ -366,6 +573,12 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['nlp', 'transformer', 'generative-ai', 'ai-model'],
         specialists: ['data-scientist', 'product-manager'],
         tools: ['LangChain', 'Prompt Templates', 'Few-shot примеры'],
+        purpose: 'Настроить поведение и качество ответов AI',
+        elements: ['System prompt', 'Few-shot примеры', 'Temperature tuning', 'Output format'],
+        mistakes: ['Слишком длинный промпт', 'Нет ограничений', 'Prompt injection уязвимость'],
+        bestPractices: ['Итеративная оптимизация', 'Eval-набор для тестирования', 'Guardrails'],
+        dependencies: [],
+        complexity: 'medium',
       },
       {
         id: 'llm-api',
@@ -376,66 +589,100 @@ export const prototypes: ProjectPrototype[] = [
         terms: ['api', 'http', 'transformer', 'neural-network', 'generative-ai'],
         specialists: ['backend-developer', 'ml-engineer'],
         tools: ['OpenAI API', 'Anthropic API', 'LangChain', 'Node.js/Python'],
+        purpose: 'Получать ответы от языковой модели',
+        elements: ['API-клиент', 'Token counter', 'Fallback модели', 'Cost tracking'],
+        mistakes: ['API key на клиенте', 'Нет fallback', 'Игнорирование rate limits'],
+        bestPractices: ['Серверный вызов', 'Retry с backoff', 'Мониторинг стоимости'],
+        dependencies: ['chat-ui', 'prompt-engineering'],
+        complexity: 'high',
       },
       {
         id: 'rag-pipeline',
         label: 'RAG-пайплайн',
-        description: 'Retrieval-Augmented Generation: поиск по базе знаний, эмбеддинги документов, векторная БД для контекстных ответов.',
+        description: 'Retrieval-Augmented Generation: поиск по базе знаний, эмбеддинги документов, векторная БД.',
         x: 50, y: 30, width: 50, height: 20,
         color: 'border-orange-400',
         terms: ['dataset', 'data-preprocessing', 'nlp', 'algorithm', 'sql'],
         specialists: ['ml-engineer', 'data-scientist', 'backend-developer'],
         tools: ['Pinecone/Weaviate', 'OpenAI Embeddings', 'LangChain', 'PostgreSQL + pgvector'],
+        purpose: 'Давать ответы на основе собственных данных',
+        elements: ['Embeddings', 'Векторный поиск', 'Chunking', 'Reranking'],
+        mistakes: ['Слишком большие чанки', 'Нет reranking', 'Устаревшие данные'],
+        bestPractices: ['Оптимальный chunk size', 'Hybrid search', 'Регулярная переиндексация'],
+        dependencies: ['llm-api'],
+        complexity: 'high',
       },
       {
         id: 'knowledge-base',
         label: 'База знаний',
-        description: 'Хранилище документов, FAQ, инструкций. Загрузка, парсинг и индексация файлов (PDF, DOCX, HTML).',
+        description: 'Хранилище документов, FAQ, инструкций. Загрузка, парсинг и индексация файлов.',
         x: 0, y: 50, width: 50, height: 20,
         color: 'border-red-400',
         terms: ['sql', 'object', 'module', 'data-preprocessing'],
         specialists: ['backend-developer', 'system-analyst'],
         tools: ['Supabase Storage', 'Unstructured.io', 'PostgreSQL'],
+        purpose: 'Хранить и структурировать знания для AI',
+        elements: ['Загрузка файлов', 'Парсинг', 'Индексация', 'Версионирование'],
+        dependencies: ['rag-pipeline'],
+        complexity: 'medium',
       },
       {
         id: 'memory-context',
         label: 'Память и контекст',
-        description: 'История диалогов, краткосрочная и долгосрочная память. Управление окном контекста и суммаризация.',
+        description: 'История диалогов, краткосрочная и долгосрочная память.',
         x: 50, y: 50, width: 50, height: 20,
         color: 'border-yellow-400',
         terms: ['cache', 'variable', 'algorithm', 'nlp'],
         specialists: ['ml-engineer', 'backend-developer'],
         tools: ['Redis', 'LangChain Memory', 'Token Counter'],
+        purpose: 'Сохранять контекст разговора между сессиями',
+        elements: ['Session memory', 'Summary memory', 'Token window', 'User preferences'],
+        dependencies: ['llm-api'],
+        complexity: 'high',
       },
       {
         id: 'safety-moderation',
         label: 'Безопасность и модерация',
-        description: 'Фильтрация нежелательного контента, защита от инъекций промптов, логирование запросов.',
+        description: 'Фильтрация нежелательного контента, защита от инъекций промптов.',
         x: 0, y: 70, width: 50, height: 15,
         color: 'border-pink-400',
         terms: ['testing', 'api', 'function'],
         specialists: ['security-engineer', 'ml-engineer', 'qa-engineer'],
         tools: ['OpenAI Moderation API', 'Guardrails', 'Logging'],
+        purpose: 'Защитить систему от злоупотреблений',
+        elements: ['Input sanitization', 'Output filtering', 'Prompt injection defense', 'Logging'],
+        mistakes: ['Нет фильтрации', 'Prompt injection', 'Утечка системного промпта'],
+        bestPractices: ['Многоуровневая защита', 'Rate limiting', 'Полное логирование'],
+        dependencies: ['llm-api'],
+        complexity: 'high',
       },
       {
         id: 'analytics-ai',
         label: 'Аналитика использования',
-        description: 'Метрики качества ответов, удовлетворённость пользователей, стоимость токенов, A/B-тесты промптов.',
+        description: 'Метрики качества ответов, удовлетворённость пользователей, стоимость токенов.',
         x: 50, y: 70, width: 50, height: 15,
         color: 'border-teal-400',
         terms: ['algorithm', 'sql', 'testing'],
         specialists: ['data-scientist', 'product-manager', 'product-designer'],
         tools: ['Amplitude', 'LangSmith', 'PostgreSQL', 'Recharts'],
+        purpose: 'Понимать качество и стоимость работы AI',
+        elements: ['CSAT', 'Token usage', 'Response quality', 'Cost dashboard'],
+        dependencies: ['llm-api'],
+        complexity: 'medium',
       },
       {
         id: 'deploy-ai',
         label: 'Деплой и масштабирование',
-        description: 'Развёртывание сервиса, управление нагрузкой, fallback на другие модели, rate limiting.',
+        description: 'Развёртывание сервиса, управление нагрузкой, fallback на другие модели.',
         x: 0, y: 85, width: 100, height: 15,
         color: 'border-gray-400',
         terms: ['deploy', 'hosting', 'microservice', 'cache'],
         specialists: ['devops-engineer', 'backend-developer'],
         tools: ['Docker', 'Kubernetes', 'CloudFlare', 'Vercel/Railway'],
+        purpose: 'Обеспечить стабильную работу в продакшне',
+        elements: ['CI/CD', 'Load balancing', 'Model fallback', 'Rate limiting'],
+        dependencies: [],
+        complexity: 'high',
       },
     ],
   },
