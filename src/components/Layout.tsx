@@ -1,9 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Book, Workflow, BrainCircuit, Star, Search, Menu, X, Briefcase, Layers, Zap, MoreHorizontal } from 'lucide-react';
+import { Book, Workflow, BrainCircuit, Star, Menu, X, Briefcase, Layers, Zap, MoreHorizontal } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { GlobalSearch } from './GlobalSearch';
 import { useState } from 'react';
-import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,9 +12,6 @@ import {
 
 interface LayoutProps {
   children: React.ReactNode;
-  searchQuery?: string;
-  onSearchChange?: (q: string) => void;
-  showSearch?: boolean;
 }
 
 const navItems = [
