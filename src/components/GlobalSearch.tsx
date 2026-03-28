@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Book, Workflow, BrainCircuit, Briefcase, Layers, Zap } from 'lucide-react';
+import { Book, Workflow, BrainCircuit, Briefcase, Layers, Zap, Mic, MicOff } from 'lucide-react';
 import {
   CommandDialog,
   CommandEmpty,
@@ -15,6 +15,7 @@ import { quizzes } from '@/data/quizzes';
 import { specialties } from '@/data/specialties';
 import { prototypes } from '@/data/prototypes';
 import { features } from '@/data/features';
+import { toast } from '@/hooks/use-toast';
 
 function Highlight({ text, query }: { text: string; query: string }) {
   if (!query.trim()) return <>{text}</>;
@@ -33,9 +34,14 @@ function Highlight({ text, query }: { text: string; query: string }) {
   );
 }
 
+// Check if browser supports Speech Recognition
+const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
 export function GlobalSearch() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,9 +55,76 @@ export function GlobalSearch() {
     return () => document.removeEventListener('keydown', down);
   }, []);
 
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
+    setIsListening(false);
+  }, []);
+
+  const startListening = useCallback(() => {
+    if (!SpeechRecognition) {
+      toast({
+        title: 'Голосовой поиск недоступен',
+        description: 'Ваш браузер не поддерживает распознавание речи. Попробуйте Chrome или Edge.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ru-RU';
+    recognition.interimResults = true;
+    recognition.continuous = false;
+
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results)
+        .map((result: any) => result[0].transcript)
+        .join('');
+      setQuery(transcript);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      if (event.error === 'not-allowed') {
+        toast({
+          title: 'Доступ к микрофону запрещён',
+          description: 'Разрешите доступ к микрофону в настройках браузера.',
+          variant: 'destructive',
+        });
+      }
+      stopListening();
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
+  }, [stopListening]);
+
+  const toggleVoice = useCallback(() => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  }, [isListening, startListening, stopListening]);
+
+  // Stop listening when dialog closes
+  useEffect(() => {
+    if (!open) {
+      stopListening();
+    }
+  }, [open, stopListening]);
+
   const go = (path: string) => {
     setOpen(false);
     setQuery('');
+    stopListening();
     navigate(path);
   };
 
@@ -66,7 +139,35 @@ export function GlobalSearch() {
       </button>
 
       <CommandDialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setQuery(''); }}>
-        <CommandInput placeholder="Искать термины, процессы, квизы..." onValueChange={setQuery} />
+        <div className="relative">
+          <CommandInput
+            placeholder="Искать термины, процессы, квизы..."
+            onValueChange={setQuery}
+            value={query}
+          />
+          {SpeechRecognition && (
+            <button
+              onClick={toggleVoice}
+              aria-label={isListening ? 'Остановить голосовой поиск' : 'Голосовой поиск'}
+              className={`absolute right-3 top-1/2 -translate-y-1/2 shrink-0 p-1.5 rounded-md transition-colors ${
+                isListening
+                  ? 'text-destructive bg-destructive/10 animate-pulse'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+              }`}
+            >
+              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </button>
+          )}
+        </div>
+        {isListening && (
+          <div className="px-4 py-2 text-xs text-muted-foreground bg-muted/50 flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-destructive"></span>
+            </span>
+            Говорите...
+          </div>
+        )}
         <CommandList>
           <CommandEmpty>Ничего не найдено</CommandEmpty>
 
