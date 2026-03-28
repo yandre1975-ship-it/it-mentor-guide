@@ -1,9 +1,15 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Book, Workflow, BrainCircuit, Star, Search, Menu, X, Briefcase, Layers, Zap } from 'lucide-react';
+import { Book, Workflow, BrainCircuit, Star, Search, Menu, X, Briefcase, Layers, Zap, MoreHorizontal } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { GlobalSearch } from './GlobalSearch';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -21,6 +27,10 @@ const navItems = [
   { to: '/quizzes', icon: BrainCircuit, label: 'Квизы' },
   { to: '/favorites', icon: Star, label: 'Избранное' },
 ];
+
+// Mobile bottom nav: first 4 + "More" for the rest
+const mobileMainNav = navItems.slice(0, 4);
+const mobileMoreNav = navItems.slice(4);
 
 export function Layout({ children, searchQuery, onSearchChange, showSearch = false }: LayoutProps) {
   const location = useLocation();
@@ -52,14 +62,15 @@ export function Layout({ children, searchQuery, onSearchChange, showSearch = fal
           <GlobalSearch />
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => {
               const active = location.pathname === item.to;
               return (
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors
+                  aria-current={active ? 'page' : undefined}
+                  className={`flex items-center gap-1.5 px-2.5 py-2 rounded-md text-sm font-medium transition-colors
                     ${active ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'}`}
                 >
                   <item.icon className="h-4 w-4" />
@@ -69,17 +80,55 @@ export function Layout({ children, searchQuery, onSearchChange, showSearch = fal
             })}
           </nav>
 
+          {/* Tablet nav — icons + dropdown */}
+          <nav className="hidden md:flex lg:hidden items-center gap-1">
+            {navItems.slice(0, 5).map((item) => {
+              const active = location.pathname === item.to;
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  title={item.label}
+                  aria-current={active ? 'page' : undefined}
+                  className={`flex items-center p-2 rounded-md transition-colors
+                    ${active ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'}`}
+                >
+                  <item.icon className="h-4 w-4" />
+                </Link>
+              );
+            })}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+                <MoreHorizontal className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {navItems.slice(5).map((item) => (
+                  <DropdownMenuItem key={item.to} asChild>
+                    <Link to={item.to} className="flex items-center gap-2">
+                      <item.icon className="h-4 w-4" />
+                      {item.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </nav>
+
           <ThemeToggle />
 
           {/* Mobile menu toggle */}
-          <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          <button
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
+          >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
 
         {/* Mobile dropdown */}
         {mobileMenuOpen && (
-          <nav className="md:hidden border-t p-2 flex flex-col gap-1">
+          <nav className="md:hidden border-t p-2 flex flex-col gap-1" role="navigation" aria-label="Мобильная навигация">
             {navItems.map((item) => {
               const active = location.pathname === item.to;
               return (
@@ -104,15 +153,16 @@ export function Layout({ children, searchQuery, onSearchChange, showSearch = fal
         {children}
       </main>
 
-      {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t bg-background/95 backdrop-blur no-print">
+      {/* Mobile bottom nav — 5 items max (4 + More) */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t bg-background/95 backdrop-blur no-print" role="navigation" aria-label="Основная навигация">
         <div className="flex justify-around py-2">
-          {navItems.map((item) => {
+          {mobileMainNav.map((item) => {
             const active = location.pathname === item.to;
             return (
               <Link
                 key={item.to}
                 to={item.to}
+                aria-current={active ? 'page' : undefined}
                 className={`flex flex-col items-center gap-0.5 text-xs px-2 py-1
                   ${active ? 'text-primary' : 'text-muted-foreground'}`}
               >
@@ -121,6 +171,26 @@ export function Layout({ children, searchQuery, onSearchChange, showSearch = fal
               </Link>
             );
           })}
+          {/* More button */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={`flex flex-col items-center gap-0.5 text-xs px-2 py-1
+                ${mobileMoreNav.some(i => i.to === location.pathname) ? 'text-primary' : 'text-muted-foreground'}`}
+            >
+              <MoreHorizontal className="h-5 w-5" />
+              Ещё
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" side="top" sideOffset={8}>
+              {mobileMoreNav.map((item) => (
+                <DropdownMenuItem key={item.to} asChild>
+                  <Link to={item.to} className="flex items-center gap-2">
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </nav>
 
