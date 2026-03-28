@@ -1225,4 +1225,92 @@ export default function Home({ data }) {
     difficulty: 'beginner',
     relatedTerms: ['api', 'sql', 'microservice'],
   },
+  {
+    id: 'spec-ui-ux',
+    title: 'UI/UX-дизайнер',
+    definition: 'Проектирует удобные и красивые интерфейсы. UX отвечает за логику взаимодействия, UI — за визуальное оформление.',
+    analogy: 'Архитектор + декоратор: UX — это планировка комнат (удобно ли ходить), а UI — обои, мебель и освещение (приятно ли находиться).',
+    exampleCode: `/* Пример дизайн-токенов */
+:root {
+  --color-primary: #3B82F6;
+  --radius: 8px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+}
+
+.button {
+  background: var(--color-primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+}`,
+    exampleLanguage: 'css',
+    category: 'specialties',
+    difficulty: 'beginner',
+    relatedTerms: ['framework', 'spec-frontend'],
+  },
+  {
+    id: 'spec-product-manager',
+    title: 'Продакт-менеджер',
+    definition: 'Определяет стратегию продукта: что строить, зачем и в каком порядке. Работает на стыке бизнеса, технологий и пользовательского опыта.',
+    analogy: 'Капитан корабля: он не гребёт (не пишет код), но выбирает курс (стратегию), следит за картой (метриками) и координирует команду.',
+    exampleCode: `# Product Roadmap (Q1 2025)
+
+| Приоритет | Фича              | Метрика        |
+|-----------|-------------------|----------------|
+| P0        | Онбординг         | Retention +15% |
+| P1        | Уведомления       | DAU +10%       |
+| P2        | Тёмная тема       | NPS +5         |
+
+## RICE Score = (Reach * Impact * Confidence) / Effort`,
+    exampleLanguage: 'markdown',
+    category: 'specialties',
+    difficulty: 'beginner',
+    relatedTerms: ['api', 'testing', 'spec-analyst'],
+  },
+  {
+    id: 'spec-project-manager',
+    title: 'Проджект-менеджер',
+    definition: 'Управляет процессом разработки: планирует спринты, контролирует сроки и бюджет, устраняет блокеры и обеспечивает доставку продукта вовремя.',
+    analogy: 'Дирижёр оркестра: каждый музыкант (разработчик) играет свою партию, а дирижёр следит, чтобы все играли слаженно и вовремя.',
+    exampleCode: `# Scrum Sprint Planning
+
+Sprint Goal: "Запустить регистрацию"
+Duration: 2 weeks
+
+## Backlog:
+- [ ] US-01: Форма регистрации (5 SP)
+- [ ] US-02: Email-валидация (3 SP)
+- [ ] US-03: OAuth Google (8 SP)
+
+Velocity: ~16 SP/sprint`,
+    exampleLanguage: 'markdown',
+    category: 'specialties',
+    difficulty: 'beginner',
+    relatedTerms: ['bug', 'deploy', 'commit'],
+  },
+  {
+    id: 'spec-techlead',
+    title: 'Тимлид / Техлид',
+    definition: 'Технический лидер команды. Принимает архитектурные решения, проводит код-ревью, менторит разработчиков и отвечает за качество кодовой базы.',
+    analogy: 'Старший мастер в цехе: сам умеет работать на любом станке, но главное — обучает новичков, проверяет качество деталей и решает, какую технологию использовать.',
+    exampleCode: `// Architecture Decision Record (ADR)
+
+## ADR-003: Переход на микросервисы
+
+### Контекст
+Монолит стал узким местом: деплой 2 часа,
+команда из 15 человек мешает друг другу.
+
+### Решение
+Выделить auth, payments, notifications
+в отдельные сервисы.
+
+### Последствия
++ Независимый деплой
+- Сложность инфраструктуры`,
+    exampleLanguage: 'markdown',
+    category: 'specialties',
+    difficulty: 'intermediate',
+    relatedTerms: ['pattern', 'microservice', 'stack'],
+  },
 ];
