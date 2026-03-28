@@ -116,6 +116,24 @@ export default function Quizzes() {
     );
   }
 
+  // Keyboard shortcuts for quiz
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!activeQuiz) return;
+      const question = activeQuiz.questions[currentQ];
+      if (!answered) {
+        const num = parseInt(e.key);
+        if (num >= 1 && num <= question.options.length) {
+          handleAnswer(num - 1);
+        }
+      } else if (e.key === 'Enter') {
+        handleNext();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [activeQuiz, currentQ, answered, handleAnswer, handleNext]);
+
   // Active question
   return (
     <Layout>
