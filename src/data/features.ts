@@ -11,6 +11,7 @@ export interface Feature {
   specialistIds: string[];
   tools: string[];
   howItWorks: string;
+  diagramCode: string;
 }
 
 export const featureCategoryLabels: Record<FeatureCategory, string> = {
