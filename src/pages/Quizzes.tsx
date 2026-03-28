@@ -177,7 +177,8 @@ export default function Quizzes() {
                   disabled={answered && i !== selected && i !== question.correctIndex}
                 >
                   {icon}
-                  <span className="ml-1">{option}</span>
+                  <span className="ml-1 flex-1">{option}</span>
+                  {!answered && <kbd className="ml-auto text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded font-mono">{i + 1}</kbd>}
                 </Button>
               );
             })}
