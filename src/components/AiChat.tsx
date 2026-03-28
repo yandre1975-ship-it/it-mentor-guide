@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Loader2, Mic, MicOff } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
@@ -228,28 +228,14 @@ export function AiChat() {
           </div>
 
           {/* Input */}
-          <div className="border-t p-3">
-            <div className="flex items-end gap-2">
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Задайте вопрос..."
-                rows={1}
-                className="flex-1 resize-none rounded-xl border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground max-h-24"
-                style={{ minHeight: '40px' }}
-              />
-              <Button
-                size="icon"
-                onClick={send}
-                disabled={!input.trim() || isLoading}
-                className="shrink-0 h-10 w-10 rounded-xl"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          <ChatInput
+            input={input}
+            setInput={setInput}
+            onSend={send}
+            onKeyDown={handleKeyDown}
+            isLoading={isLoading}
+            inputRef={inputRef}
+          />
         </div>
       )}
     </>
