@@ -14,6 +14,7 @@ export default function Quizzes() {
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
   const [answered, setAnswered] = useState(false);
+  const [search, setSearch] = useState('');
 
   const activeQuiz = quizzes.find((q) => q.id === activeQuizId);
 
@@ -52,15 +53,22 @@ export default function Quizzes() {
 
   // Quiz list
   if (!activeQuiz) {
+    const filteredQuizzes = quizzes.filter((q) => {
+      if (!search) return true;
+      const s = search.toLowerCase();
+      return q.title.toLowerCase().includes(s) || q.questions.some(qq => qq.question.toLowerCase().includes(s));
+    });
+
     return (
-      <Layout>
+      <Layout searchQuery={search} onSearchChange={setSearch} showSearch>
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Мини-квизы</h1>
             <p className="text-muted-foreground mt-1">Проверьте свои знания после изучения терминов</p>
           </div>
+          <p className="text-sm text-muted-foreground">Найдено: {filteredQuizzes.length}</p>
           <div className="grid gap-4 sm:grid-cols-2">
-            {quizzes.map((quiz) => (
+            {filteredQuizzes.map((quiz) => (
               <Card
                 key={quiz.id}
                 className="cursor-pointer hover:shadow-md hover:border-primary/30 transition-all"

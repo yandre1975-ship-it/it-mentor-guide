@@ -120,17 +120,26 @@ function StepPlayer({ steps, processId }: { steps: { title: string; description:
 
 export default function Processes() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+
+  const filtered = processes.filter((p) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.steps.some(s => s.title.toLowerCase().includes(q));
+  });
 
   return (
-    <Layout>
+    <Layout searchQuery={search} onSearchChange={setSearch} showSearch>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Интерактивные схемы процессов</h1>
           <p className="text-muted-foreground mt-1">Визуализация ключевых IT-процессов с пошаговым описанием</p>
         </div>
 
+        <p className="text-sm text-muted-foreground">Найдено: {filtered.length}</p>
+
         <div className="space-y-4">
-          {processes.map((process) => {
+          {filtered.map((process) => {
             const isExpanded = expandedId === process.id;
             return (
               <Card key={process.id} className="overflow-hidden">
