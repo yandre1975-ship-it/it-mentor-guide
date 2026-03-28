@@ -324,13 +324,7 @@ export default function Prototypes() {
             {currentZone ? (
               <ZoneDetailPanel zone={currentZone} allZones={current.zones} onClose={() => setActiveZone(null)} />
             ) : (
-              <div className="rounded-xl border-2 border-dashed bg-card p-6 text-center text-muted-foreground h-full flex flex-col items-center justify-center gap-3 min-h-[200px]">
-                <Eye className="h-8 w-8 opacity-30" />
-                <div>
-                  <p className="text-sm font-medium">Выберите блок на схеме</p>
-                  <p className="text-xs mt-1">Увидите: назначение, элементы, ошибки, чеклист, инструменты и зависимости</p>
-                </div>
-              </div>
+              <ProjectOverviewPanel project={current} />
             )}
           </div>
         </div>
