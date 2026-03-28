@@ -7,7 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { Star, StarOff, ArrowLeft, Lightbulb, Code, LinkIcon, Play } from 'lucide-react';
+import { Star, StarOff, ArrowLeft, Lightbulb, Code, LinkIcon, Play, ChevronRight } from 'lucide-react';
+import { quizzes } from '@/data/quizzes';
 
 export default function TermDetail() {
   const { id } = useParams<{ id: string }>();
@@ -36,11 +37,23 @@ export default function TermDetail() {
   };
 
   const relatedTermObjects = terms.filter((t) => term.relatedTerms.includes(t.id));
+  const relatedQuiz = quizzes.find((q) => q.relatedTermId === term.id);
 
   return (
     <Layout>
       <div className="max-w-3xl mx-auto space-y-8">
-        {/* Back + actions */}
+        {/* Breadcrumbs */}
+        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Link to="/" className="hover:text-foreground transition-colors">Каталог</Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <Link to={`/?category=${term.category}`} className="hover:text-foreground transition-colors">
+            {categoryLabels[term.category]}
+          </Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <span className="text-foreground font-medium truncate">{term.title}</span>
+        </nav>
+
+        {/* Actions */}
         <div className="flex items-center justify-between gap-4">
           <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4 mr-1" /> Назад
@@ -78,6 +91,21 @@ export default function TermDetail() {
           </div>
           <CodeBlock code={term.exampleCode} language={term.exampleLanguage} />
         </section>
+
+        {/* Related quiz */}
+        {relatedQuiz && (
+          <section className="rounded-lg border bg-primary/5 border-primary/20 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="font-semibold text-sm">🧠 Проверь себя</p>
+                <p className="text-sm text-muted-foreground">{relatedQuiz.title} — {relatedQuiz.questions.length} вопросов</p>
+              </div>
+              <Link to="/quizzes">
+                <Button size="sm" variant="outline">Пройти квиз</Button>
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* Related terms */}
         {relatedTermObjects.length > 0 && (
