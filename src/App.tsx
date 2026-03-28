@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AiChat } from "@/components/AiChat";
 import Index from "./pages/Index.tsx";
 import TermDetail from "./pages/TermDetail.tsx";
 import Processes from "./pages/Processes.tsx";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/favorites" element={<Favorites />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <AiChat />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
