@@ -1313,4 +1313,277 @@ Velocity: ~16 SP/sprint`,
     difficulty: 'intermediate',
     relatedTerms: ['pattern', 'microservice', 'stack'],
   },
+
+  // === ОБЛАЧНЫЕ ТЕХНОЛОГИИ ===
+  {
+    id: 'cloud-computing',
+    title: 'Облачные вычисления (Cloud Computing)',
+    definition: 'Модель предоставления вычислительных ресурсов (серверов, хранилищ, баз данных, сетей, ПО) через интернет по требованию, с оплатой за использование.',
+    analogy: 'Электричество из розетки: вам не нужна собственная электростанция — вы подключаетесь к общей сети и платите за потреблённые киловатты. Так же и с облаком — не покупаете серверы, а арендуете мощности.',
+    exampleCode: `# Основные модели облачных услуг:
+
+IaaS (Infrastructure as a Service)
+├── Виртуальные серверы, сети, хранилища
+├── Примеры: AWS EC2, Google Compute, Azure VM
+└── Аналогия: аренда пустого офиса — сами ставите мебель
+
+PaaS (Platform as a Service)
+├── Готовая платформа для разработки
+├── Примеры: Heroku, Google App Engine, Vercel
+└── Аналогия: коворкинг — столы и Wi-Fi уже есть
+
+SaaS (Software as a Service)
+├── Готовое ПО через браузер
+├── Примеры: Gmail, Slack, Notion, Figma
+└── Аналогия: ресторан — вам подают готовое блюдо`,
+    exampleLanguage: 'markdown',
+    category: 'architecture',
+    difficulty: 'beginner',
+    relatedTerms: ['docker', 'kubernetes', 'serverless', 'cdn'],
+  },
+  {
+    id: 'docker',
+    title: 'Docker',
+    definition: 'Платформа контейнеризации, которая упаковывает приложение со всеми зависимостями в изолированный контейнер, работающий одинаково на любой машине.',
+    analogy: 'Морской контейнер: неважно, что внутри — мебель, электроника или еда — контейнер стандартного размера, его можно погрузить на любой корабль, поезд или грузовик. Docker делает то же самое с софтом.',
+    exampleCode: `# Dockerfile — рецепт контейнера
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+
+# Сборка и запуск
+docker build -t my-app .
+docker run -p 3000:3000 my-app
+
+# Docker Compose — несколько контейнеров
+version: "3.8"
+services:
+  app:
+    build: .
+    ports: ["3000:3000"]
+    depends_on: [db]
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: secret`,
+    exampleLanguage: 'dockerfile',
+    category: 'architecture',
+    difficulty: 'intermediate',
+    relatedTerms: ['cloud-computing', 'kubernetes', 'ci-cd'],
+  },
+  {
+    id: 'kubernetes',
+    title: 'Kubernetes (K8s)',
+    definition: 'Система оркестрации контейнеров, которая автоматизирует развёртывание, масштабирование и управление контейнеризированными приложениями.',
+    analogy: 'Диспетчер аэропорта: он решает, какой самолёт (контейнер) на какую полосу (сервер) посадить, перенаправляет при перегрузке и заменяет сломавшийся борт резервным.',
+    exampleCode: `# deployment.yaml — описание приложения
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 3  # 3 копии приложения
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-app
+        image: my-app:latest
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+---
+# service.yaml — сетевой доступ
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 3000
+  selector:
+    app: my-app`,
+    exampleLanguage: 'yaml',
+    category: 'architecture',
+    difficulty: 'advanced',
+    relatedTerms: ['docker', 'cloud-computing', 'ci-cd', 'microservice'],
+  },
+  {
+    id: 'serverless',
+    title: 'Serverless (Бессерверные вычисления)',
+    definition: 'Модель выполнения кода, при которой облачный провайдер автоматически управляет серверами. Разработчик пишет только функции, а инфраструктура масштабируется автоматически.',
+    analogy: 'Такси вместо личного автомобиля: не нужно покупать машину, платить за парковку и бензин — вызываете, когда нужно, и платите только за поездку.',
+    exampleCode: `// AWS Lambda — serverless функция
+export const handler = async (event) => {
+  const { name } = JSON.parse(event.body);
+
+  // Функция запускается только при вызове
+  // Автоматически масштабируется от 0 до тысяч копий
+  const greeting = \`Привет, \${name}!\`;
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ message: greeting }),
+  };
+};
+
+// Supabase Edge Function (Deno)
+Deno.serve(async (req) => {
+  const { name } = await req.json();
+  return new Response(
+    JSON.stringify({ message: \`Привет, \${name}!\` }),
+    { headers: { "Content-Type": "application/json" } }
+  );
+});`,
+    exampleLanguage: 'javascript',
+    category: 'architecture',
+    difficulty: 'intermediate',
+    relatedTerms: ['cloud-computing', 'api', 'rest-api'],
+  },
+  {
+    id: 'cdn',
+    title: 'CDN (Content Delivery Network)',
+    definition: 'Распределённая сеть серверов по всему миру, которая кеширует и доставляет контент пользователю с ближайшего сервера, ускоряя загрузку.',
+    analogy: 'Сеть пиццерий по городу: вместо одной на весь город, пиццерии открыты в каждом районе. Заказ доставляется из ближайшей за 15 минут вместо часа.',
+    exampleCode: `# Как работает CDN:
+Пользователь (Москва) → Edge-сервер (Москва) → Контент
+Пользователь (Токио) → Edge-сервер (Токио) → Контент
+
+# Без CDN:
+Пользователь (Токио) → Сервер (Нью-Йорк) → 200ms задержки
+
+# С CDN:
+Пользователь (Токио) → Edge (Токио) → 20ms задержки
+
+# Настройка CDN (Cloudflare/Vercel)
+# Заголовки кеширования
+Cache-Control: public, max-age=31536000, immutable
+
+# Популярные CDN-провайдеры:
+# - Cloudflare (бесплатный план)
+# - AWS CloudFront
+# - Vercel Edge Network
+# - Fastly`,
+    exampleLanguage: 'markdown',
+    category: 'architecture',
+    difficulty: 'beginner',
+    relatedTerms: ['cloud-computing', 'caching'],
+  },
+  {
+    id: 'ci-cd',
+    title: 'CI/CD',
+    definition: 'Continuous Integration / Continuous Deployment — практика автоматической сборки, тестирования и развёртывания кода при каждом изменении в репозитории.',
+    analogy: 'Конвейер на заводе: деталь (код) проходит контроль качества (тесты), сборку и автоматически попадает на полку магазина (продакшн) — без ручного вмешательства.',
+    exampleCode: `# .github/workflows/deploy.yml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+      - run: docker build -t myapp .
+      - run: docker push registry.io/myapp
+      - run: kubectl apply -f k8s/`,
+    exampleLanguage: 'yaml',
+    category: 'architecture',
+    difficulty: 'intermediate',
+    relatedTerms: ['git', 'docker', 'kubernetes', 'cloud-computing'],
+  },
+  {
+    id: 'load-balancer',
+    title: 'Балансировщик нагрузки',
+    definition: 'Распределяет входящий сетевой трафик между несколькими серверами, чтобы ни один из них не перегружался, обеспечивая высокую доступность.',
+    analogy: 'Администратор в банке: направляет клиентов к свободным окнам, чтобы очередь двигалась равномерно и никто не ждал слишком долго.',
+    exampleCode: `# Nginx как балансировщик нагрузки
+upstream backend {
+    # Алгоритм Round Robin (по умолчанию)
+    server app1:3000;
+    server app2:3000;
+    server app3:3000;
+}
+
+server {
+    listen 80;
+    location / {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+
+# Алгоритмы балансировки:
+# Round Robin — по очереди
+# Least Connections — к наименее загруженному
+# IP Hash — привязка клиента к серверу
+# Weighted — с учётом мощности сервера`,
+    exampleLanguage: 'nginx',
+    category: 'architecture',
+    difficulty: 'advanced',
+    relatedTerms: ['cloud-computing', 'kubernetes', 'microservice'],
+  },
+  {
+    id: 'monitoring',
+    title: 'Мониторинг и логирование',
+    definition: 'Систематический сбор метрик, логов и трейсов для отслеживания состояния приложения, обнаружения ошибок и анализа производительности.',
+    analogy: 'Приборная панель автомобиля: спидометр, уровень топлива, температура двигателя — вы видите состояние системы в реальном времени и получаете сигнал, если что-то не так.',
+    exampleCode: `// Structured logging (Winston)
+import winston from 'winston';
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' }),
+  ],
+});
+
+logger.info('User registered', { userId: '123', email: 'a@b.com' });
+logger.error('Payment failed', { orderId: '456', error: 'timeout' });
+
+// Метрики (Prometheus)
+// Ключевые метрики:
+// - Latency (задержка ответа)
+// - Traffic (запросы/сек)
+// - Errors (% ошибок)
+// - Saturation (загрузка CPU/RAM)
+
+// Инструменты: Grafana, Prometheus, Datadog, Sentry`,
+    exampleLanguage: 'javascript',
+    category: 'architecture',
+    difficulty: 'intermediate',
+    relatedTerms: ['cloud-computing', 'ci-cd', 'docker'],
+  },
 ];
