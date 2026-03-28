@@ -55,7 +55,7 @@ export default function Favorites() {
   }
 
   return (
-    <Layout searchQuery={search} onSearchChange={setSearch} showSearch>
+    <Layout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
