@@ -12,9 +12,17 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, context } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    let systemPrompt = `Ты — AI-ассистент IT-Библиотеки. Помогаешь пользователям разобраться в IT-терминах, технологиях, процессах разработки и специальностях. 
+Отвечай кратко, структурированно и на русском языке. Используй markdown для форматирования.
+Если не знаешь ответа — честно скажи об этом и предложи поискать в библиотеке.`;
+
+    if (context) {
+      systemPrompt += `\n\nКонтекст: ${context}. Учитывай это при ответах — давай релевантную информацию и связывай с тем, что пользователь сейчас изучает.`;
+    }
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -29,9 +37,7 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `Ты — AI-ассистент IT-Библиотеки. Помогаешь пользователям разобраться в IT-терминах, технологиях, процессах разработки и специальностях. 
-Отвечай кратко, структурированно и на русском языке. Используй markdown для форматирования.
-Если не знаешь ответа — честно скажи об этом и предложи поискать в библиотеке.`,
+              content: systemPrompt,
             },
             ...messages,
           ],

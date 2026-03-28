@@ -1,4 +1,7 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
+import { terms } from '@/data/terms';
+import { categoryLabels } from '@/data/types';
 import { MessageCircle, X, Send, Bot, User, Loader2, Mic, MicOff, Trash2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
@@ -14,11 +17,13 @@ async function streamChat({
   onDelta,
   onDone,
   signal,
+  context,
 }: {
   messages: Msg[];
   onDelta: (text: string) => void;
   onDone: () => void;
   signal?: AbortSignal;
+  context?: string;
 }) {
   const resp = await fetch(CHAT_URL, {
     method: 'POST',
@@ -26,7 +31,7 @@ async function streamChat({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
     },
-    body: JSON.stringify({ messages }),
+    body: JSON.stringify({ messages, context }),
     signal,
   });
 
@@ -178,6 +183,36 @@ function saveMessages(msgs: Msg[]) {
   try { localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(msgs)); } catch {}
 }
 
+const sectionNames: Record<string, string> = {
+  '/': 'Каталог IT-терминов',
+  '/processes': 'Процессы разработки',
+  '/quizzes': 'Квизы и тесты',
+  '/specialties': 'IT-специальности',
+  '/prototypes': 'Проекты и прототипы',
+  '/features': 'Фичи',
+  '/favorites': 'Избранное',
+};
+
+function usePageContext(): string | undefined {
+  const location = useLocation();
+  return useMemo(() => {
+    // Term detail page
+    const termMatch = location.pathname.match(/^\/term\/(.+)$/);
+    if (termMatch) {
+      const term = terms.find(t => t.id === termMatch[1]);
+      if (term) {
+        return `Пользователь сейчас изучает термин «${term.title}» (категория: ${categoryLabels[term.category]}). Определение: ${term.definition}`;
+      }
+    }
+    // Section pages
+    const section = sectionNames[location.pathname];
+    if (section) {
+      return `Пользователь находится в разделе «${section}»`;
+    }
+    return undefined;
+  }, [location.pathname]);
+}
+
 export function AiChat() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>(loadMessages);
@@ -186,6 +221,7 @@ export function AiChat() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const pageContext = usePageContext();
 
   useEffect(() => { saveMessages(messages); }, [messages]);
 
@@ -227,6 +263,7 @@ export function AiChat() {
         onDelta: upsert,
         onDone: () => setIsLoading(false),
         signal: controller.signal,
+        context: pageContext,
       });
     } catch (e: any) {
       if (e.name !== 'AbortError') {
@@ -234,7 +271,7 @@ export function AiChat() {
       }
       setIsLoading(false);
     }
-  }, [input, isLoading, messages]);
+  }, [input, isLoading, messages, pageContext]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -261,7 +298,9 @@ export function AiChat() {
             <Bot className="h-5 w-5 text-primary" />
             <div className="flex-1">
               <p className="text-sm font-semibold">AI-ассистент</p>
-              <p className="text-xs text-muted-foreground">Спросите о терминах, технологиях, процессах</p>
+              <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                {pageContext ? `📍 ${pageContext.slice(0, 60)}…` : 'Спросите о терминах, технологиях, процессах'}
+              </p>
             </div>
             {messages.length > 0 && (
               <button
