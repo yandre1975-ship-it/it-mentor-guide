@@ -9,6 +9,7 @@ import Processes from "./pages/Processes.tsx";
 import Quizzes from "./pages/Quizzes.tsx";
 import Favorites from "./pages/Favorites.tsx";
 import Specialties from "./pages/Specialties.tsx";
+import Prototypes from "./pages/Prototypes.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/processes" element={<Processes />} />
           <Route path="/quizzes" element={<Quizzes />} />
           <Route path="/specialties" element={<Specialties />} />
+          <Route path="/prototypes" element={<Prototypes />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
