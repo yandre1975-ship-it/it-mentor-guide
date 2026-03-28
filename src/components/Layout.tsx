@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Book, Workflow, BrainCircuit, Star, Search, Menu, X, Briefcase, Layers } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { GlobalSearch } from './GlobalSearch';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 
@@ -47,6 +48,7 @@ export function Layout({ children, searchQuery, onSearchChange, showSearch = fal
           )}
 
           <div className="flex-1" />
+          <GlobalSearch />
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1">
