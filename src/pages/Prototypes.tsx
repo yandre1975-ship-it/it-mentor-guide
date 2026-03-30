@@ -29,8 +29,7 @@ const zoneComplexity = {
   high: { label: 'Сложно', icon: '🔴' },
 };
 
-type ViewMode = 'structure' | 'roles' | 'complexity' | 'dependencies';
-type OverlayPanel = 'compare' | 'progress' | 'constructor' | null;
+type ViewMode = 'structure' | 'dependencies';
 
 // ─── Enhanced Visual Schema ─────────────────────────────────────────────────
 function PrototypeVisual({ zones, activeZone, onSelect, viewMode, highlightSpecialist }: {
