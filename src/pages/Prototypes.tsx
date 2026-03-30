@@ -44,20 +44,6 @@ function PrototypeVisual({ zones, activeZone, onSelect, viewMode }: {
     return activeZ?.dependencies?.includes(zone.id) || zone.dependencies?.includes(activeZone);
   };
 
-  const getComplexityBg = (zone: PrototypeZone) => {
-    if (viewMode !== 'complexity') return '';
-    switch (zone.complexity) {
-      case 'low': return 'bg-[hsl(var(--success))]/10 border-[hsl(var(--success))]';
-      case 'medium': return 'bg-[hsl(var(--warning))]/10 border-[hsl(var(--warning))]';
-      case 'high': return 'bg-[hsl(var(--destructive))]/10 border-[hsl(var(--destructive))]';
-      default: return '';
-    }
-  };
-
-  const isHighlightedByRole = (zone: PrototypeZone) => {
-    if (viewMode !== 'roles' || !highlightSpecialist) return true;
-    return zone.specialists.includes(highlightSpecialist);
-  };
 
   // Build dependency edges
   const dependencyEdges = useMemo(() => {
