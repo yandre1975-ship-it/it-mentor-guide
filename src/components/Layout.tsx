@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Book, Workflow, BrainCircuit, Star, Menu, X, Briefcase, Layers, Zap, MoreHorizontal } from 'lucide-react';
+import { Book, Workflow, BrainCircuit, Star, Menu, X, Briefcase, Layers, MoreHorizontal } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { GlobalSearch } from './GlobalSearch';
 import { useState } from 'react';
