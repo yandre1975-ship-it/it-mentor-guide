@@ -16,9 +16,6 @@ import type { PrototypeZone, ZoneLayer } from '@/data/prototypes';
 import { ProjectOverviewPanel } from '@/components/prototypes/ProjectOverviewPanel';
 import { ZoneDetailPanel } from '@/components/prototypes/ZoneDetailPanel';
 import { MobileZoneList } from '@/components/prototypes/MobileZoneList';
-import { CompareProjects } from '@/components/prototypes/CompareProjects';
-import { ProgressDashboard } from '@/components/prototypes/ProgressDashboard';
-import { ProjectConstructor } from '@/components/prototypes/ProjectConstructor';
 
 const complexityConfig = {
   beginner: { label: 'Junior', color: 'bg-[hsl(var(--success))] text-[hsl(var(--success-foreground))]' },
