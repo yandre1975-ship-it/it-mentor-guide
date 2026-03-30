@@ -32,12 +32,11 @@ const zoneComplexity = {
 type ViewMode = 'structure' | 'dependencies';
 
 // ─── Enhanced Visual Schema ─────────────────────────────────────────────────
-function PrototypeVisual({ zones, activeZone, onSelect, viewMode, highlightSpecialist }: {
+function PrototypeVisual({ zones, activeZone, onSelect, viewMode }: {
   zones: PrototypeZone[];
   activeZone: string | null;
   onSelect: (id: string | null) => void;
   viewMode: ViewMode;
-  highlightSpecialist?: string | null;
 }) {
   const getDependencyHighlight = (zone: PrototypeZone) => {
     if (viewMode !== 'dependencies' || !activeZone) return false;
