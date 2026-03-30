@@ -8,8 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Layers, ArrowRight, BarChart3,
-  Users, GitBranch, Search, GitCompare, Trophy, Hammer
+  Layers, ArrowRight,
+  Users, GitBranch, Search,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import type { PrototypeZone, ZoneLayer } from '@/data/prototypes';
