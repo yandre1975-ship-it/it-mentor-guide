@@ -1,4 +1,4 @@
-export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
+﻿export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 
 export type Category =
   | 'basics'
@@ -20,9 +20,9 @@ export const categoryLabels: Record<Category, string> = {
 };
 
 export const difficultyLabels: Record<Difficulty, string> = {
-  beginner: 'Junior',
-  intermediate: 'Middle',
-  advanced: 'Senior',
+  beginner: 'Для всех',
+  intermediate: 'Нужны основы',
+  advanced: 'Для разбирающихся',
 };
 
 export const difficultyColors: Record<Difficulty, string> = {
@@ -42,6 +42,7 @@ export interface Term {
   difficulty: Difficulty;
   relatedTerms: string[];
   videoUrl?: string;
+  prerequisites?: string[];
 }
 
 export interface ProcessStep {

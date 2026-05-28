@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+﻿import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,50 +13,50 @@ serve(async (req) => {
 
   try {
     const { messages, context } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const AI_API_KEY = Deno.env.get("AI_API_KEY");
+    const AI_API_URL = Deno.env.get("AI_API_URL") || "https://api.openai.com/v1/chat/completions";
+    const AI_MODEL = Deno.env.get("AI_MODEL") || "gpt-4o-mini";
 
-    let systemPrompt = `Ты — AI-ассистент IT-Библиотеки. Помогаешь пользователям разобраться в IT-терминах, технологиях, процессах разработки и специальностях. 
-Отвечай кратко, структурированно и на русском языке. Используй markdown для форматирования.
-Если не знаешь ответа — честно скажи об этом и предложи поискать в библиотеке.`;
+    if (!AI_API_KEY) throw new Error("AI_API_KEY is not configured");
+
+    let systemPrompt = `Ты — педагог и наставник в IT-Библиотеке. Твоя задача — не давать готовый ответ сразу, а помочь пользователю самому дойти до понимания через вопросы и аналогии.
+
+Правила:
+1. Не выдавай готовое определение в первом предложении. Задай уточняющий вопрос или предложи аналогию.
+2. Если пользователь путается — вернись к более простому понятию.
+3. Хвали за правильные догадки («Отличная мысль!», «Именно так!»).
+4. Используй markdown. Отвечай на русском.
+5. Если не знаешь ответа — честно скажи об этом.
+
+Пример хорошего ответа:
+Пользователь: "Что такое API?"
+Ты: "Отличный вопрос! Давайте подумаем вместе. Вы когда-нибудь заказывали еду в ресторане? Вы смотрите меню, говорите официанту, что хотите, и получаете блюдо. Что в этой ситуации похоже на API — меню, официант или кухня?"`;
 
     if (context) {
-      systemPrompt += `\n\nКонтекст: ${context}. Учитывай это при ответах — давай релевантную информацию и связывай с тем, что пользователь сейчас изучает.`;
+      systemPrompt += `\n\nКонтекст: ${context}. Учитывай это при ответах.`;
     }
 
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [
-            {
-              role: "system",
-              content: systemPrompt,
-            },
-            ...messages,
-          ],
-          stream: true,
-        }),
-      }
-    );
+    const response = await fetch(AI_API_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${AI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: AI_MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          ...messages,
+        ],
+        stream: true,
+      }),
+    });
 
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Слишком много запросов, подождите немного." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Кредиты исчерпаны." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       const t = await response.text();

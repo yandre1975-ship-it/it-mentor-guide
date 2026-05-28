@@ -178,13 +178,23 @@ function TeamBlock({ zones, activeZone }: { zones: PrototypeZone[]; activeZone: 
 // ─── Main Page ──────────────────────────────────────────────────────────────
 export default function Prototypes() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialProject = searchParams.get('project') || prototypes[0].id;
+  const urlProject = searchParams.get('project');
+  const initialProject = urlProject && prototypes.some(p => p.id === urlProject) ? urlProject : prototypes[0].id;
   const initialZone = searchParams.get('zone') || null;
 
   const [selectedPrototype, setSelectedPrototype] = useState(initialProject);
   const [activeZone, setActiveZone] = useState<string | null>(initialZone);
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('structure');
+
+  // Sync with URL changes
+  useEffect(() => {
+    const p = searchParams.get('project');
+    if (p && prototypes.some(pr => pr.id === p) && p !== selectedPrototype) {
+      setSelectedPrototype(p);
+      setActiveZone(null);
+    }
+  }, [searchParams, selectedPrototype]);
 
   useEffect(() => {
     const params = new URLSearchParams();

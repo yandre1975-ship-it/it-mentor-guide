@@ -14,17 +14,17 @@ mermaid.initialize({
   fontFamily: 'Inter, system-ui, sans-serif',
 });
 
-let counter = 0;
-
 export function MermaidDiagram({ chart, className = '' }: MermaidDiagramProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const idRef = useRef(`mermaid-${Math.random().toString(36).slice(2)}`);
 
   useEffect(() => {
-    if (!ref.current) return;
+    const el = ref.current;
+    if (!el) return;
+    let mounted = true;
     setLoading(true);
-    const id = `mermaid-${++counter}`;
 
     const isDark = document.documentElement.classList.contains('dark');
     mermaid.initialize({
@@ -34,16 +34,21 @@ export function MermaidDiagram({ chart, className = '' }: MermaidDiagramProps) {
       fontFamily: 'Inter, system-ui, sans-serif',
     });
 
-    mermaid.render(id, chart).then(({ svg }) => {
-      if (ref.current) {
-        ref.current.innerHTML = svg;
-        setError(false);
-      }
+    mermaid.render(idRef.current, chart).then(({ svg }) => {
+      if (!mounted || !el) return;
+      el.innerHTML = svg;
+      setError(false);
       setLoading(false);
     }).catch(() => {
+      if (!mounted) return;
       setError(true);
       setLoading(false);
     });
+
+    return () => {
+      mounted = false;
+      el.innerHTML = '';
+    };
   }, [chart]);
 
   if (error) {
@@ -51,7 +56,7 @@ export function MermaidDiagram({ chart, className = '' }: MermaidDiagramProps) {
   }
 
   return (
-    <div className={`overflow-x-auto ${className}`} aria-label="Диаграмма процесса">
+    <div className={`overflow-x-auto ${className}`} role="img" aria-label="Диаграмма процесса">
       {loading && (
         <div className="space-y-3 p-2">
           <Skeleton className="h-4 w-3/4" />

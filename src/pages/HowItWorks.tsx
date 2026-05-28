@@ -29,7 +29,9 @@ function StepPlayer({ steps }: { steps: { title: string; description: string }[]
   useEffect(() => {
     if (!isPlaying || activeStep === null) return;
     if (activeStep >= steps.length - 1) { setIsPlaying(false); return; }
-    const timer = setTimeout(() => setActiveStep(s => (s ?? 0) + 1), 2500);
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const delay = prefersReduced ? 15000 : 2500;
+    const timer = setTimeout(() => setActiveStep(s => (s ?? 0) + 1), delay);
     return () => clearTimeout(timer);
   }, [isPlaying, activeStep, steps.length]);
 
@@ -196,46 +198,48 @@ export default function HowItWorks() {
                       </div>
                     </CardHeader>
 
-                    {isExpanded && (
-                      <CardContent className="space-y-4 pt-0" onClick={e => e.stopPropagation()}>
-                        <div>
-                          <h4 className="text-sm font-semibold mb-2">Поток данных</h4>
-                          <div className="rounded-lg border bg-card p-4">
-                            <MermaidDiagram chart={feature.diagramCode} />
-                          </div>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-semibold mb-1">Как это работает</h4>
-                          <p className="text-sm text-muted-foreground">{feature.howItWorks}</p>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-semibold mb-1">Инструменты</h4>
-                          <div className="flex flex-wrap gap-1.5">
-                            {feature.tools.map(tool => <Badge key={tool} variant="secondary" className="text-xs">{tool}</Badge>)}
-                          </div>
-                        </div>
-                        {relatedTerms.length > 0 && (
+                    <div className={`animate-collapse ${isExpanded ? 'animate-collapse-open' : ''}`}>
+                      <div className="animate-collapse-inner">
+                        <CardContent className="space-y-4 pt-0" onClick={e => e.stopPropagation()}>
                           <div>
-                            <h4 className="text-sm font-semibold mb-1">Связанные термины</h4>
-                            <div className="flex flex-wrap gap-1.5">
-                              {relatedTerms.map(t => (
-                                <Link key={t.id} to={`/term/${t.id}`}>
-                                  <Badge variant="outline" className="text-xs hover:bg-primary/10 cursor-pointer">{t.title}</Badge>
-                                </Link>
-                              ))}
+                            <h4 className="text-sm font-semibold mb-2">Поток данных</h4>
+                            <div className="rounded-lg border bg-card p-4">
+                              <MermaidDiagram chart={feature.diagramCode} />
                             </div>
                           </div>
-                        )}
-                        {relatedSpecs.length > 0 && (
                           <div>
-                            <h4 className="text-sm font-semibold mb-1">Кто реализует</h4>
+                            <h4 className="text-sm font-semibold mb-1">Как это работает</h4>
+                            <p className="text-sm text-muted-foreground">{feature.howItWorks}</p>
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-semibold mb-1">Инструменты</h4>
                             <div className="flex flex-wrap gap-1.5">
-                              {relatedSpecs.map(s => <Badge key={s.id} variant="outline" className="text-xs">{s.title}</Badge>)}
+                              {feature.tools.map(tool => <Badge key={tool} variant="secondary" className="text-xs">{tool}</Badge>)}
                             </div>
                           </div>
-                        )}
-                      </CardContent>
-                    )}
+                          {relatedTerms.length > 0 && (
+                            <div>
+                              <h4 className="text-sm font-semibold mb-1">Связанные термины</h4>
+                              <div className="flex flex-wrap gap-1.5">
+                                {relatedTerms.map(t => (
+                                  <Link key={t.id} to={`/term/${t.id}`}>
+                                    <Badge variant="outline" className="text-xs hover:bg-primary/10 cursor-pointer">{t.title}</Badge>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {relatedSpecs.length > 0 && (
+                            <div>
+                              <h4 className="text-sm font-semibold mb-1">Кто реализует</h4>
+                              <div className="flex flex-wrap gap-1.5">
+                                {relatedSpecs.map(s => <Badge key={s.id} variant="outline" className="text-xs">{s.title}</Badge>)}
+                              </div>
+                            </div>
+                          )}
+                        </CardContent>
+                      </div>
+                    </div>
                   </Card>
                 );
               })}
@@ -265,17 +269,19 @@ export default function HowItWorks() {
                       {isExpanded ? <ChevronUp className="h-5 w-5 text-muted-foreground shrink-0" /> : <ChevronDown className="h-5 w-5 text-muted-foreground shrink-0" />}
                     </div>
                   </CardHeader>
-                  {isExpanded && (
-                    <CardContent className="pt-0 space-y-6">
-                      <div className="rounded-lg border bg-card p-4">
-                        <MermaidDiagram chart={process.diagramCode} />
-                      </div>
-                      <div className="space-y-3">
-                        <h3 className="font-semibold">Пошаговое описание</h3>
-                        <StepPlayer steps={process.steps} />
-                      </div>
-                    </CardContent>
-                  )}
+                  <div className={`animate-collapse ${isExpanded ? 'animate-collapse-open' : ''}`}>
+                    <div className="animate-collapse-inner">
+                      <CardContent className="pt-0 space-y-6">
+                        <div className="rounded-lg border bg-card p-4">
+                          <MermaidDiagram chart={process.diagramCode} />
+                        </div>
+                        <div className="space-y-3">
+                          <h3 className="font-semibold">Пошаговое описание</h3>
+                          <StepPlayer steps={process.steps} />
+                        </div>
+                      </CardContent>
+                    </div>
+                  </div>
                 </Card>
               );
             })}

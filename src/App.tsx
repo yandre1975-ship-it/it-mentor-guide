@@ -1,19 +1,47 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+﻿import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AiChat } from "@/components/AiChat";
-import Index from "./pages/Index.tsx";
-import TermDetail from "./pages/TermDetail.tsx";
-import HowItWorks from "./pages/HowItWorks.tsx";
-import Quizzes from "./pages/Quizzes.tsx";
-import Favorites from "./pages/Favorites.tsx";
-import Specialties from "./pages/Specialties.tsx";
-import Prototypes from "./pages/Prototypes.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import { PageTransition } from "@/components/PageTransition";
+import AiAssistant from "./pages/AiAssistant";
+import Terms from "./pages/Index";
+import TermDetail from "./pages/TermDetail";
+import HowItWorks from "./pages/HowItWorks";
+import Quizzes from "./pages/Quizzes";
+import Favorites from "./pages/Favorites";
+import Specialties from "./pages/Specialties";
+import Prototypes from "./pages/Prototypes";
+import LearnModule from "./pages/LearnModule";
+import CareerQuiz from "./pages/CareerQuiz";
+import Review from "./pages/Review";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+function AnimatedRoutes() {
+  const location = useLocation();
+  return (
+    <PageTransition key={location.pathname}>
+      <Routes location={location}>
+        <Route path="/" element={<AiAssistant />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/term/:id" element={<TermDetail />} />
+        <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/processes" element={<HowItWorks />} />
+        <Route path="/features" element={<HowItWorks />} />
+        <Route path="/quizzes" element={<Quizzes />} />
+        <Route path="/specialties" element={<Specialties />} />
+        <Route path="/prototypes" element={<Prototypes />} />
+        <Route path="/favorites" element={<Favorites />} />
+        <Route path="/learn/:moduleId" element={<LearnModule />} />
+        <Route path="/career-quiz" element={<CareerQuiz />} />
+        <Route path="/review" element={<Review />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </PageTransition>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -21,19 +49,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/term/:id" element={<TermDetail />} />
-          <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/processes" element={<HowItWorks />} />
-          <Route path="/features" element={<HowItWorks />} />
-          <Route path="/quizzes" element={<Quizzes />} />
-          <Route path="/specialties" element={<Specialties />} />
-          <Route path="/prototypes" element={<Prototypes />} />
-          <Route path="/favorites" element={<Favorites />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <AiChat />
+        <AnimatedRoutes />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

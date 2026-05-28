@@ -213,6 +213,7 @@ server.listen(3000, () => {
     category: 'web',
     difficulty: 'beginner',
     relatedTerms: ['api', 'http', 'hosting', 'dns'],
+    prerequisites: ['http', 'web-server'],
   },
   {
     id: 'http',
@@ -305,6 +306,7 @@ app.get("/api/hello", (req, res) => {
     category: 'web',
     difficulty: 'beginner',
     relatedTerms: ['api', 'module', 'pattern'],
+    prerequisites: ['function', 'variable'],
   },
   {
     id: 'hosting',
@@ -602,6 +604,7 @@ app.post("/api/orders", async (req, res) => {
     category: 'architecture',
     difficulty: 'advanced',
     relatedTerms: ['api', 'stack', 'module', 'pattern'],
+    prerequisites: ['api', 'web-server'],
   },
   {
     id: 'stack',

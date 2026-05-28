@@ -1,16 +1,25 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+﻿import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { motion, useDragControls, AnimatePresence } from 'framer-motion';
 import { terms } from '@/data/terms';
 import { categoryLabels } from '@/data/types';
-import { MessageCircle, X, Send, Bot, User, Loader2, Mic, MicOff, Trash2 } from 'lucide-react';
+import { Sparkles, X, Send, Bot, User, Loader2, Mic, MicOff, Trash2, HelpCircle, Lightbulb, RotateCcw, GripHorizontal } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 
-type Msg = { role: 'user' | 'assistant'; content: string };
+import confetti from 'canvas-confetti';
+
+type Msg = { role: 'user' | 'assistant'; content: string; timestamp?: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
-const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+interface WindowWithSpeech extends Window {
+  SpeechRecognition?: new () => SpeechRecognition;
+  webkitSpeechRecognition?: new () => SpeechRecognition;
+}
+
+const SpeechRecognition = ((window as WindowWithSpeech).SpeechRecognition || (window as WindowWithSpeech).webkitSpeechRecognition);
 
 async function streamChat({
   messages,
@@ -93,7 +102,7 @@ function ChatInput({
   inputRef: React.RefObject<HTMLTextAreaElement>;
 }) {
   const [listening, setListening] = useState(false);
-  const recRef = useRef<any>(null);
+  const recRef = useRef<SpeechRecognition | null>(null);
 
   const stopListening = useCallback(() => {
     recRef.current?.stop();
@@ -111,8 +120,8 @@ function ChatInput({
     rec.lang = 'ru-RU';
     rec.interimResults = true;
     rec.continuous = false;
-    rec.onresult = (e: any) => {
-      const transcript = Array.from(e.results).map((r: any) => r[0].transcript).join('');
+    rec.onresult = (e: SpeechRecognitionEvent) => {
+      const transcript = Array.from(e.results).map((r) => r[0].transcript).join('');
       setInput(transcript);
     };
     rec.onerror = () => stopListening();
@@ -125,7 +134,7 @@ function ChatInput({
   return (
     <div className="border-t p-3">
       {listening && (
-        <div className="flex items-center gap-2 px-2 pb-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 px-3 pb-2 text-xs text-muted-foreground">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-destructive" />
@@ -133,7 +142,7 @@ function ChatInput({
           Говорите...
         </div>
       )}
-      <div className="flex items-end gap-2">
+      <div className="relative flex items-center">
         <textarea
           ref={inputRef}
           value={input}
@@ -141,30 +150,31 @@ function ChatInput({
           onKeyDown={onKeyDown}
           placeholder="Задайте вопрос..."
           rows={1}
-          className="flex-1 resize-none rounded-xl border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground max-h-24"
-          style={{ minHeight: '40px' }}
+          className="w-full resize-none rounded-full border bg-background pl-4 pr-24 py-3 text-sm outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground max-h-24"
+          style={{ minHeight: '44px' }}
         />
-        {SpeechRecognition && (
+        <div className="absolute right-2 flex items-center gap-1">
+          {SpeechRecognition && (
+            <button
+              onClick={toggleVoice}
+              aria-label={listening ? 'Остановить запись' : 'Голосовой ввод'}
+              className={`shrink-0 h-8 w-8 rounded-full flex items-center justify-center transition-colors ${
+                listening
+                  ? 'bg-destructive/10 text-destructive animate-pulse'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+              }`}
+            >
+              {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </button>
+          )}
           <button
-            onClick={toggleVoice}
-            aria-label={listening ? 'Остановить запись' : 'Голосовой ввод'}
-            className={`shrink-0 h-10 w-10 rounded-xl flex items-center justify-center transition-colors ${
-              listening
-                ? 'bg-destructive/10 text-destructive animate-pulse'
-                : 'text-muted-foreground hover:text-foreground hover:bg-secondary border'
-            }`}
+            onClick={onSend}
+            disabled={!input.trim() || isLoading}
+            className="shrink-0 h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-40 transition-colors hover:brightness-105"
           >
-            {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            <Send className="h-4 w-4" />
           </button>
-        )}
-        <Button
-          size="icon"
-          onClick={onSend}
-          disabled={!input.trim() || isLoading}
-          className="shrink-0 h-10 w-10 rounded-xl"
-        >
-          <Send className="h-4 w-4" />
-        </Button>
+        </div>
       </div>
     </div>
   );
@@ -180,7 +190,7 @@ function loadMessages(): Msg[] {
 }
 
 function saveMessages(msgs: Msg[]) {
-  try { localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(msgs)); } catch {}
+  try { localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(msgs)); } catch { /* ignore */ }
 }
 
 const sectionNames: Record<string, string> = {
@@ -191,12 +201,13 @@ const sectionNames: Record<string, string> = {
   '/prototypes': 'Проекты и прототипы',
   '/features': 'Фичи',
   '/favorites': 'Избранное',
+  '/review': 'Повторение',
+  '/career-quiz': 'Профориентация',
 };
 
 function usePageContext(): string | undefined {
   const location = useLocation();
   return useMemo(() => {
-    // Term detail page
     const termMatch = location.pathname.match(/^\/term\/(.+)$/);
     if (termMatch) {
       const term = terms.find(t => t.id === termMatch[1]);
@@ -204,7 +215,6 @@ function usePageContext(): string | undefined {
         return `Пользователь сейчас изучает термин «${term.title}» (категория: ${categoryLabels[term.category]}). Определение: ${term.definition}`;
       }
     }
-    // Section pages
     const section = sectionNames[location.pathname];
     if (section) {
       return `Пользователь находится в разделе «${section}»`;
@@ -222,22 +232,52 @@ export function AiChat() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const pageContext = usePageContext();
+  const isNearBottomRef = useRef(true);
+  const dragControls = useDragControls();
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
+  const sendRef = useRef<(() => void) | null>(null);
 
   useEffect(() => { saveMessages(messages); }, [messages]);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+    const el = scrollRef.current;
+    if (!el) return;
+    if (isNearBottomRef.current) {
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    }
   }, [messages]);
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const threshold = 100;
+    isNearBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+  }, []);
 
   useEffect(() => {
     if (open) inputRef.current?.focus();
   }, [open]);
 
+  // Listen for global open-ai-chat event
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const custom = e as CustomEvent<{ question?: string }>;
+      setOpen(true);
+      if (custom.detail?.question) {
+        setInput(custom.detail.question);
+        setTimeout(() => sendRef.current?.(), 300);
+      }
+    };
+    window.addEventListener('open-ai-chat', handler);
+    return () => window.removeEventListener('open-ai-chat', handler);
+  }, []);
+
   const send = useCallback(async () => {
     const text = input.trim();
     if (!text || isLoading) return;
 
-    const userMsg: Msg = { role: 'user', content: text };
+    const userMsg: Msg = { role: 'user', content: text, timestamp: new Date().toISOString() };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsLoading(true);
@@ -253,25 +293,27 @@ export function AiChat() {
         if (last?.role === 'assistant') {
           return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantSoFar } : m);
         }
-        return [...prev, { role: 'assistant', content: assistantSoFar }];
+        return [...prev, { role: 'assistant', content: assistantSoFar, timestamp: new Date().toISOString() }];
       });
     };
 
     try {
       await streamChat({
-        messages: [...messages, userMsg],
+        messages: [...messagesRef.current, userMsg],
         onDelta: upsert,
         onDone: () => setIsLoading(false),
         signal: controller.signal,
         context: pageContext,
       });
-    } catch (e: any) {
-      if (e.name !== 'AbortError') {
+    } catch (e: unknown) {
+      if (e instanceof Error && e.name !== 'AbortError') {
         toast({ title: 'Ошибка', description: e.message, variant: 'destructive' });
       }
       setIsLoading(false);
     }
-  }, [input, isLoading, messages, pageContext]);
+  }, [input, isLoading, pageContext]);
+
+  sendRef.current = send;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -280,47 +322,85 @@ export function AiChat() {
     }
   };
 
+  const quickActions = [
+    { label: 'Объясни проще', icon: Lightbulb, text: 'Объясни проще, как для ребёнка' },
+    { label: 'Аналогия', icon: HelpCircle, text: 'Приведи жизненную аналогию' },
+    { label: 'Разбери по частям', icon: RotateCcw, text: 'Разбери по частям' },
+  ];
+
   return (
     <>
       {!open && (
-        <button
+        <motion.button
           onClick={() => setOpen(true)}
-          className="fixed bottom-20 md:bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all flex items-center justify-center no-print"
+          className="fixed top-20 md:top-20 left-6 z-50 h-[72px] w-[72px] rounded-full bg-gradient-to-br from-primary to-violet-600 text-primary-foreground shadow-fab flex flex-col items-center justify-center gap-0.5 no-print border-2 border-white dark:border-slate-800"
           aria-label="Открыть AI-чат"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          animate={{
+            boxShadow: [
+              '0 0 0 0 rgba(99, 102, 241, 0.4)',
+              '0 0 0 20px rgba(99, 102, 241, 0)',
+              '0 0 0 0 rgba(99, 102, 241, 0)',
+            ],
+          }}
+          transition={{
+            boxShadow: { repeat: Infinity, duration: 2, ease: 'easeInOut' },
+          }}
         >
-          <MessageCircle className="h-6 w-6" />
-        </button>
+          <Sparkles className="h-6 w-6" />
+          <span className="text-[10px] font-bold leading-none">AI</span>
+          <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center border-2 border-background">
+            1
+          </span>
+        </motion.button>
       )}
 
       {open && (
-        <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 w-[calc(100vw-2rem)] md:w-[420px] h-[500px] md:h-[560px] rounded-2xl border bg-card shadow-2xl flex flex-col overflow-hidden no-print animate-in slide-in-from-bottom-4 fade-in duration-300">
-          <div className="flex items-center gap-3 px-4 py-3 border-b bg-primary/5">
-            <Bot className="h-5 w-5 text-primary" />
-            <div className="flex-1">
+        <motion.div
+          drag
+          dragControls={dragControls}
+          dragMomentum={false}
+          dragElastic={0}
+          dragListener={false}
+          initial={{ x: 0, y: 0 }}
+          className="fixed top-20 md:top-20 left-4 md:left-6 z-50 w-[calc(100vw-2rem)] md:w-[420px] h-[500px] md:h-[560px] rounded-2xl border bg-card shadow-2xl flex flex-col overflow-hidden no-print"
+        >
+          <div
+            onPointerDown={(e) => dragControls.start(e)}
+            className="flex items-center gap-3 px-4 py-3 border-b bg-primary/5 cursor-grab active:cursor-grabbing"
+          >
+            <GripHorizontal className="h-4 w-4 text-muted-foreground/50 shrink-0" />
+            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+              <Bot className="h-4 w-4 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold">AI-ассистент</p>
-              <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+              <p className="text-[10px] text-muted-foreground truncate">
                 {pageContext ? `📍 ${pageContext.slice(0, 60)}…` : 'Спросите о терминах, технологиях, процессах'}
               </p>
             </div>
             {messages.length > 0 && (
               <button
                 onClick={() => setMessages([])}
-                className="p-1 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                className="p-1.5 rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
                 aria-label="Очистить историю"
                 title="Очистить историю"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
             )}
-            <button onClick={() => setOpen(false)} className="p-1 rounded-md hover:bg-secondary transition-colors">
+            <button onClick={() => setOpen(false)} className="p-1.5 rounded-full hover:bg-secondary transition-colors">
               <X className="h-4 w-4" />
             </button>
           </div>
 
-          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+          <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground gap-3">
-                <Bot className="h-10 w-10 opacity-40" />
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Bot className="h-6 w-6 text-primary opacity-60" />
+                </div>
                 <div>
                   <p className="font-medium text-sm">Привет! Я AI-помощник</p>
                   <p className="text-xs mt-1">Задайте вопрос по IT — объясню термин, процесс или технологию</p>
@@ -342,15 +422,15 @@ export function AiChat() {
             {messages.map((msg, i) => (
               <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {msg.role === 'assistant' && (
-                  <div className="shrink-0 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+                  <div className="shrink-0 w-7 h-7 rounded-full bg-white dark:bg-slate-800 border flex items-center justify-center">
                     <Bot className="h-4 w-4 text-primary" />
                   </div>
                 )}
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${
+                  className={`max-w-[80%] px-4 py-2.5 text-sm ${
                     msg.role === 'user'
-                      ? 'bg-primary text-primary-foreground rounded-br-md'
-                      : 'bg-secondary rounded-bl-md'
+                      ? 'bg-gradient-to-br from-primary to-primary-600 text-primary-foreground rounded-2xl rounded-tr-sm'
+                      : 'bg-white dark:bg-slate-800 border rounded-2xl rounded-tl-sm'
                   }`}
                 >
                   {msg.role === 'assistant' ? (
@@ -360,10 +440,15 @@ export function AiChat() {
                   ) : (
                     <p className="whitespace-pre-wrap">{msg.content}</p>
                   )}
+                  {msg.timestamp && (
+                    <span className={`text-[10px] opacity-60 mt-1 block ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                      {new Date(msg.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  )}
                 </div>
                 {msg.role === 'user' && (
-                  <div className="shrink-0 h-7 w-7 rounded-full bg-primary flex items-center justify-center mt-0.5">
-                    <User className="h-4 w-4 text-primary-foreground" />
+                  <div className="shrink-0 w-7 h-7 rounded-full bg-secondary flex items-center justify-center">
+                    <User className="h-4 w-4 text-muted-foreground" />
                   </div>
                 )}
               </div>
@@ -371,12 +456,31 @@ export function AiChat() {
 
             {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
               <div className="flex gap-2 items-center">
-                <div className="shrink-0 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center">
+                <div className="shrink-0 w-7 h-7 rounded-full bg-white dark:bg-slate-800 border flex items-center justify-center">
                   <Bot className="h-4 w-4 text-primary" />
                 </div>
-                <div className="bg-secondary rounded-2xl rounded-bl-md px-4 py-3">
+                <div className="bg-white dark:bg-slate-800 border rounded-2xl rounded-tl-md px-4 py-3">
                   <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                 </div>
+              </div>
+            )}
+
+            {/* Quick actions */}
+            {messages.length > 0 && !isLoading && messages[messages.length - 1]?.role === 'assistant' && (
+              <div className="flex flex-wrap gap-2 justify-start pl-9">
+                {quickActions.map((action) => (
+                  <button
+                    key={action.label}
+                    onClick={() => {
+                      setInput(action.text);
+                      setTimeout(() => send(), 100);
+                    }}
+                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border bg-secondary/50 hover:bg-secondary transition-colors"
+                  >
+                    <action.icon className="h-3 w-3" />
+                    {action.label}
+                  </button>
+                ))}
               </div>
             )}
           </div>
@@ -389,7 +493,7 @@ export function AiChat() {
             isLoading={isLoading}
             inputRef={inputRef}
           />
-        </div>
+        </motion.div>
       )}
     </>
   );
